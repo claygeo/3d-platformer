@@ -41,8 +41,8 @@ class Player {
     }
     
     init() {
-        // Create player geometry (capsule-like character)
-        const geometry = new THREE.CapsuleGeometry(0.5, 1.5, 4, 8);
+        // Create player geometry (cylinder-like character for r128 compatibility)
+        const geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 8);
         const material = new THREE.MeshLambertMaterial({ 
             color: 0x4CAF50,
             transparent: true,
