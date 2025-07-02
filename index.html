@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canyon of Secrets - 3D Exploration Game</title>
+    <title>Mystic Mountain Ascent - 3D Exploration Game</title>
     <style>
         body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
         canvas { display: block; }
@@ -24,7 +24,7 @@
 </head>
 <body>
     <div id="loading">
-        <h1>Canyon of Secrets</h1>
+        <h1>Mystic Mountain Ascent</h1>
         <p>Loading Exploration Assets...</p>
         <div id="loadingBar"><div id="loadingFill"></div></div>
         <span id="loadingPercent">0%</span>
@@ -34,8 +34,8 @@
         <div>Score: <span id="score">0</span></div>
         <div>Lives: <span id="lives">3</span></div>
         <div>Coins: <span id="coins">0</span>/<span id="totalCoins">0</span></div>
-        <div>Keys: <span id="keys">0</span>/3</div>
-        <div>Level: <span id="currentLevel">Canyon of Secrets</span></div>
+        <div>Keys: <span id="keys">0</span>/4</div>
+        <div>Level: <span id="currentLevel">Mystic Mountain Ascent</span></div>
     </div>
 
     <div id="cameraControls" class="hidden">
@@ -51,7 +51,7 @@
         <p>WASD: Move</p>
         <p>Space: Jump</p>
         <p>Shift: Sprint</p>
-        <p>E: Interact (Levers, Buttons, Chests)</p>
+        <p>E: Interact (Levers, Buttons, Chests, Barrels)</p>
         <p>L: Climb Ladders</p>
         <p>R: Restart Level</p>
         <p>ESC: Pause</p>
@@ -62,7 +62,7 @@
 
     <div id="gameMessage" class="hidden">
         <h1 id="messageTitle">Level Complete!</h1>
-        <p id="messageText">Great job! You conquered the Canyon of Secrets!</p>
+        <p id="messageText">Great job! You conquered the Mystic Mountain Ascent!</p>
         <button id="messageButton">Play Again</button>
     </div>
 
@@ -132,7 +132,7 @@
                     Math.pow(player.position.z - platform.position.z, 2)
                 );
                 const verticalDistance = player.position.y - platform.position.y;
-                return horizontalDistance < threshold && verticalDistance > 0.5 && verticalDistance < 4;
+                return horizontalDistance < threshold && verticalDistance > 0 && verticalDistance < (platform.scale.y * 2 || 4);
             },
             lerp(start, end, factor) { return start + (end - start) * factor; },
             clamp(value, min, max) { return Math.max(min, Math.min(max, value)); },
@@ -152,6 +152,12 @@
             animateMovingPlatform(platform, startPos, endPos, speed = 0.02) {
                 const t = (Math.sin(Date.now() * speed) + 1) / 2;
                 platform.position.lerpVectors(startPos, endPos, t);
+            },
+            animateWaterfall(object, speed = 0.05, height = 15) {
+                const time = Date.now() * speed;
+                object.position.y = height - (time % height);
+                if (object.position.y < 0) object.position.y += height;
+                Utils.createParticleEffect(game.scene, new THREE.Vector3(object.position.x, 0, object.position.z), 0xADD8E6);
             },
             updateUI(id, value) {
                 const element = document.getElementById(id);
@@ -228,9 +234,9 @@
                 this.velocity = new THREE.Vector3(0, 0, 0);
                 this.position = new THREE.Vector3(0, 5, 0);
                 this.rotation = 0;
-                this.speed = 0.2;
-                this.jumpForce = 0.5;
-                this.gravity = -0.025;
+                this.speed = 0.25;
+                this.jumpForce = 0.6;
+                this.gravity = -0.03;
                 this.isGrounded = false;
                 this.isJumping = false;
                 this.isClimbing = false;
@@ -318,7 +324,7 @@
                 if (this.cameraMode === 'orbit') {
                     this.orbitControls.theta = -Math.PI / 2;
                     this.orbitControls.phi = Math.PI / 4;
-                    this.orbitControls.distance = 15;
+                    this.orbitControls.distance = 20;
                 }
             }
             update(platforms = [], collectibles = [], hazards = [], interactive = []) {
@@ -347,10 +353,10 @@
                     if (this.jumpSound) this.jumpSound.play();
                 }
                 if (this.isClimbing && this.keys.climb) {
-                    this.velocity.y = 0.15;
+                    this.velocity.y = 0.2;
                     this.gravity = 0;
                 } else {
-                    this.gravity = -0.025;
+                    this.gravity = -0.03;
                 }
                 const maxSpeed = currentSpeed * 1.2;
                 this.velocity.x = Utils.clamp(this.velocity.x, -maxSpeed, maxSpeed);
@@ -374,7 +380,7 @@
                 platforms.forEach(platform => {
                     if (Utils.isOnPlatform(this, platform)) {
                         if (this.velocity.y <= 0) {
-                            this.position.y = platform.position.y + 2;
+                            this.position.y = platform.position.y + (platform.scale.y || 2);
                             this.velocity.y = 0;
                             this.isGrounded = true;
                             this.isJumping = false;
@@ -387,7 +393,7 @@
             }
             checkCollectibleCollisions(collectibles) {
                 collectibles.forEach(collectible => {
-                    if (!collectible.userData.collected && Utils.isColliding(this, collectible, 1.5)) {
+                    if (!collectible.userData.collected && collectible.userData.visible && Utils.isColliding(this, collectible, 1.5)) {
                         this.collectItem(collectible);
                     }
                 });
@@ -417,6 +423,18 @@
                             obj.position.y += 0.5;
                             game.addScore(300);
                             Utils.createParticleEffect(this.scene, obj.position.clone(), 0xFFD700);
+                        } else if (obj.userData.type === 'breakable' && this.keys.interact && !obj.userData.broken) {
+                            obj.userData.broken = true;
+                            obj.visible = false;
+                            game.addScore(100);
+                            Utils.createParticleEffect(this.scene, obj.position.clone(), 0x8B4513);
+                            if (obj.userData.reveals) {
+                                const revealed = game.level.collectibles.find(c => c.userData.id === obj.userData.reveals);
+                                if (revealed) {
+                                    revealed.userData.visible = true;
+                                    revealed.visible = true;
+                                }
+                            }
                         }
                     } else if (obj.userData.type === 'ladder') {
                         this.isClimbing = false;
@@ -425,6 +443,7 @@
             }
             collectItem(collectible) {
                 collectible.userData.collected = true;
+                collectible.userData.visible = false;
                 collectible.visible = false;
                 Utils.createParticleEffect(this.scene, collectible.position.clone(), 0xFFD700);
                 if (this.coinSound) this.coinSound.play();
@@ -464,11 +483,11 @@
                 setTimeout(() => { game.playerDied(); }, 1000);
             }
             checkBoundaries() {
-                if (this.position.y < -30) {
+                if (this.position.y < -50) {
                     this.takeDamage();
                     this.respawn();
                 }
-                const maxDistance = 100;
+                const maxDistance = 150;
                 this.position.x = Utils.clamp(this.position.x, -maxDistance, maxDistance);
                 this.position.z = Utils.clamp(this.position.z, -maxDistance, maxDistance);
             }
@@ -497,8 +516,8 @@
                 if (this.cameraMode === 'follow') {
                     const idealCameraPosition = new THREE.Vector3(
                         this.position.x,
-                        this.position.y + 10,
-                        this.position.z + 15
+                        this.position.y + 12,
+                        this.position.z + 20
                     );
                     camera.position.lerp(idealCameraPosition, 0.05);
                     const lookAtPosition = new THREE.Vector3(
@@ -531,7 +550,7 @@
                     this.mesh.material.opacity = 0.9;
                     this.mesh.position.copy(this.position);
                 }
-                this.orbitControls = { theta: -Math.PI / 2, phi: Math.PI / 4, distance: 15 };
+                this.orbitControls = { theta: -Math.PI / 2, phi: Math.PI / 4, distance: 20 };
             }
             setupAudio(listener) {
                 this.jumpSound = new THREE.Audio(listener);
@@ -562,17 +581,22 @@
                 this.totalCoins = 0;
                 this.unlockedDoors = [];
                 this.movingPlatforms = [];
+                this.waterfallObjects = [];
                 this.assetPaths = {
                     platforms: {
                         'grass': 'assets/models/platforms/block-grass.glb',
                         'grass-large': 'assets/models/platforms/block-grass-large.glb',
                         'grass-corner': 'assets/models/platforms/block-grass-corner.glb',
                         'grass-curve': 'assets/models/platforms/block-grass-curve.glb',
+                        'grass-slope': 'assets/models/platforms/block-grass-large-slope.glb',
+                        'snow-slope': 'assets/models/platforms/block-snow-large-slope.glb',
+                        'grass-tall': 'assets/models/platforms/block-grass-large-tall.glb',
                         'platform': 'assets/models/platforms/platform.glb',
                         'platform-ramp': 'assets/models/platforms/platform-ramp.glb',
                         'terrain-dirt': 'assets/models/platforms/block-grass-large.glb',
                         'terrain-rock': 'assets/models/platforms/block-snow-large.glb',
-                        'moving-platform': 'assets/models/platforms/block-moving.glb'
+                        'moving-platform': 'assets/models/platforms/block-moving.glb',
+                        'water-platform': 'assets/models/platforms/block-moving-blue.glb'
                     },
                     collectibles: {
                         'coin-gold': 'assets/models/collectibles/coin-gold.glb',
@@ -590,7 +614,9 @@
                         'flowers': 'assets/models/environment/flowers.glb',
                         'flowers-tall': 'assets/models/environment/flowers-tall.glb',
                         'hedge': 'assets/models/environment/hedge.glb',
-                        'mushroom': 'assets/models/environment/mushrooms.glb'
+                        'mushroom': 'assets/models/environment/mushrooms.glb',
+                        'stones': 'assets/models/environment/stones.glb',
+                        'arrow': 'assets/models/environment/arrow.glb'
                     },
                     interactive: {
                         'crate': 'assets/models/interactive/crate.glb',
@@ -598,7 +624,9 @@
                         'button': 'assets/models/interactive/button-square.glb',
                         'door': 'assets/models/interactive/door-rotate.glb',
                         'lever': 'assets/models/interactive/lever.glb',
-                        'flag': 'assets/models/interactive/flag.glb'
+                        'flag': 'assets/models/interactive/flag.glb',
+                        'breakable': 'assets/models/interactive/barrel.glb',
+                        'spike-wide': 'assets/models/interactive/spike-block-wide.glb'
                     },
                     hazards: {
                         'spike': 'assets/models/hazards/spike-block.glb',
@@ -616,78 +644,100 @@
                 };
                 this.levelData = {
                     spawn: { x: 0, y: 5, z: 0 },
-                    goal: { type: 'collect_keys', count: 3 },
+                    goal: { type: 'collect_keys', count: 4 },
                     platforms: [
-                        // Base terrain (grassy plain)
-                        { type: 'terrain-dirt', position: { x: 0, y: 0, z: 0 }, scale: { x: 50, y: 1, z: 50 } },
-                        // Snowy peaks
-                        { type: 'terrain-rock', position: { x: 30, y: 2, z: -20 }, scale: { x: 10, y: 3, z: 10 } },
-                        { type: 'terrain-rock', position: { x: -25, y: 3, z: 25 }, scale: { x: 8, y: 4, z: 8 } },
-                        // Ramps to access higher areas
-                        { type: 'platform-ramp', position: { x: 10, y: 1, z: -10 }, rotation: { y: 45 }, scale: { x: 2, y: 2, z: 2 } },
-                        { type: 'platform-ramp', position: { x: -15, y: 1, z: 15 }, rotation: { y: -45 }, scale: { x: 2, y: 2, z: 2 } },
-                        // Curved paths for navigation
-                        { type: 'grass-curve', position: { x: 20, y: 1, z: 10 }, rotation: { y: 90 }, scale: { x: 3, y: 1, z: 3 } },
-                        { type: 'grass-curve', position: { x: -20, y: 1, z: -10 }, rotation: { y: -90 }, scale: { x: 3, y: 1, z: 3 } },
+                        // Base terrain (large grassy plain)
+                        { type: 'terrain-dirt', position: { x: 0, y: 0, z: 0 }, scale: { x: 100, y: 1, z: 100 } },
+                        // Mountain base (slopes and tall blocks)
+                        { type: 'grass-slope', position: { x: 30, y: 2, z: -30 }, scale: { x: 10, y: 5, z: 10 }, rotation: { y: 45 } },
+                        { type: 'grass-tall', position: { x: 30, y: 5, z: -30 }, scale: { x: 8, y: 10, z: 8 } },
+                        // Mid-tier platforms
+                        { type: 'terrain-rock', position: { x: -20, y: 10, z: 20 }, scale: { x: 12, y: 3, z: 12 } },
+                        { type: 'snow-slope', position: { x: -20, y: 12, z: 20 }, scale: { x: 8, y: 6, z: 8 }, rotation: { y: -45 } },
+                        // High-tier platforms
+                        { type: 'grass-tall', position: { x: 40, y: 20, z: 40 }, scale: { x: 10, y: 12, z: 10 } },
+                        { type: 'snow-slope', position: { x: 40, y: 25, z: 40 }, scale: { x: 6, y: 8, z: 6 } },
+                        // Ramps to connect tiers
+                        { type: 'platform-ramp', position: { x: 15, y: 2, z: -15 }, rotation: { y: 45 }, scale: { x: 3, y: 3, z: 3 } },
+                        { type: 'platform-ramp', position: { x: -10, y: 10, z: 10 }, rotation: { y: -45 }, scale: { x: 3, y: 3, z: 3 } },
                         // Moving platforms
-                        { type: 'moving-platform', position: { x: 15, y: 2, z: 20 }, scale: { x: 2, y: 1, z: 2 }, userData: { id: 'mp1', startPos: { x: 15, y: 2, z: 20 }, endPos: { x: 15, y: 5, z: 20 }, speed: 0.02 } },
-                        { type: 'moving-platform', position: { x: -10, y: 3, z: -25 }, scale: { x: 2, y: 1, z: 2 }, userData: { id: 'mp2', startPos: { x: -10, y: 3, z: -25 }, endPos: { x: -10, y: 6, z: -25 }, speed: 0.015 } }
+                        { type: 'moving-platform', position: { x: 20, y: 5, z: -20 }, scale: { x: 3, y: 1, z: 3 }, userData: { id: 'mp1', startPos: { x: 20, y: 5, z: -20 }, endPos: { x: 20, y: 10, z: -20 }, speed: 0.02 } },
+                        { type: 'moving-platform', position: { x: -15, y: 12, z: 25 }, scale: { x: 3, y: 1, z: 3 }, userData: { id: 'mp2', startPos: { x: -15, y: 12, z: 25 }, endPos: { x: -15, y: 18, z: 25 }, speed: 0.015 } },
+                        // Waterfall platforms (slippery)
+                        { type: 'water-platform', position: { x: 10, y: 10, z: 30 }, scale: { x: 4, y: 1, z: 4 } },
+                        { type: 'water-platform', position: { x: 10, y: 8, z: 30 }, scale: { x: 4, y: 1, z: 4 } },
+                        // Cave platforms
+                        { type: 'grass-curve', position: { x: 35, y: 5, z: -10 }, rotation: { y: 90 }, scale: { x: 4, y: 2, z: 4 } },
+                        // Peak platform
+                        { type: 'terrain-rock', position: { x: 50, y: 30, z: 50 }, scale: { x: 8, y: 3, z: 8 } }
                     ],
                     collectibles: [
-                        // Coins scattered across the plain
+                        // Base tier coins
                         { type: 'coin-gold', position: { x: 5, y: 2, z: 5 } },
                         { type: 'coin-silver', position: { x: -5, y: 2, z: -5 } },
                         { type: 'coin-bronze', position: { x: 10, y: 2, z: 0 } },
-                        { type: 'coin-gold', position: { x: 0, y: 2, z: 10 } },
-                        // Keys in challenging locations
-                        { type: 'key', position: { x: 30, y: 6, z: -20 } }, // On snowy peak
-                        { type: 'key', position: { x: -25, y: 7, z: 25 } }, // On another peak
-                        { type: 'key', position: { x: 40, y: 2, z: 30 } }, // In cave
-                        // Hearts and jewels for rewards
-                        { type: 'heart', position: { x: 20, y: 2, z: 15 } },
-                        { type: 'jewel', position: { x: -15, y: 2, z: -15 } }
+                        // Mid-tier collectibles
+                        { type: 'coin-gold', position: { x: -20, y: 12, z: 20 } },
+                        { type: 'heart', position: { x: -15, y: 12, z: 25 } },
+                        // Cave collectibles
+                        { type: 'key', position: { x: 35, y: 7, z: -10 }, userData: { id: 'key1' } },
+                        { type: 'jewel', position: { x: 33, y: 7, z: -12 } },
+                        // Waterfall collectibles
+                        { type: 'key', position: { x: 10, y: 12, z: 30 } },
+                        // High-tier collectibles
+                        { type: 'key', position: { x: 40, y: 22, z: 40 } },
+                        // Hidden key (revealed by barrel)
+                        { type: 'key', position: { x: -25, y: 12, z: 15 }, userData: { id: 'key2', collected: true, visible: false } }
                     ],
                     hazards: [
-                        // Spikes on snowy peak
-                        { type: 'spike', position: { x: 32, y: 2, z: -18 } },
-                        { type: 'spike', position: { x: 28, y: 2, z: -22 } },
-                        // Saws near bridge
-                        { type: 'saw', position: { x: 10, y: 2, z: -10 } },
-                        // Traps in cave
-                        { type: 'trap', position: { x: 38, y: 1, z: 28 } },
-                        { type: 'trap', position: { x: 42, y: 1, z: 32 } }
+                        // Base tier hazards
+                        { type: 'spike', position: { x: 25, y: 2, z: -25 } },
+                        { type: 'saw', position: { x: 15, y: 2, z: -15 } },
+                        // Mid-tier hazards
+                        { type: 'spike-wide', position: { x: -18, y: 10, z: 18 } },
+                        // Waterfall hazards
+                        { type: 'trap', position: { x: 12, y: 8, z: 32 } },
+                        // High-tier hazards
+                        { type: 'bomb', position: { x: 42, y: 20, z: 42 } },
+                        { type: 'trap', position: { x: 48, y: 30, z: 48 } }
                     ],
                     environment: [
-                        // Forest area
+                        // Base tier forest
                         { type: 'tree-pine', position: { x: 8, y: 1, z: 8 }, scale: { x: 2, y: 2, z: 2 } },
                         { type: 'tree', position: { x: -8, y: 1, z: 8 }, scale: { x: 2, y: 2, z: 2 } },
                         { type: 'hedge', position: { x: 10, y: 1, z: 12 } },
-                        { type: 'hedge', position: { x: -10, y: 1, z: -12 } },
                         { type: 'mushroom', position: { x: 0, y: 1, z: -8 } },
                         { type: 'flowers-tall', position: { x: 5, y: 1, z: -5 } },
-                        // Cave decorations
-                        { type: 'rocks', position: { x: 40, y: 1, z: 30 }, scale: { x: 2, y: 2, z: 2 } },
-                        { type: 'mushroom', position: { x: 38, y: 1, z: 28 } }
+                        // Waterfall stones
+                        { type: 'stones', position: { x: 10, y: 15, z: 30 }, scale: { x: 2, y: 2, z: 2 } },
+                        { type: 'stones', position: { x: 12, y: 10, z: 28 }, scale: { x: 2, y: 2, z: 2 } },
+                        // Cave decor
+                        { type: 'stones', position: { x: 35, y: 5, z: -12 }, scale: { x: 2, y: 2, z: 2 } },
+                        // Arrows for guidance
+                        { type: 'arrow', position: { x: 0, y: 1, z: 5 }, rotation: { y: 45 } },
+                        { type: 'arrow', position: { x: 15, y: 2, z: -15 }, rotation: { y: 90 } }
                     ],
                     interactive: [
-                        // Ladders to snowy peaks
-                        { type: 'ladder', position: { x: 30, y: 3, z: -20 }, scale: { x: 1, y: 3, z: 1 } },
-                        { type: 'ladder', position: { x: -25, y: 4, z: 25 }, scale: { x: 1, y: 4, z: 1 } },
-                        // Lever to activate moving platform mp1
-                        { type: 'lever', position: { x: 12, y: 1, z: 15 }, userData: { platformId: 'mp1' } },
-                        // Button to unlock door
-                        { type: 'button', position: { x: 35, y: 1, z: 25 }, userData: { platformId: 'mp2' } },
-                        // Door to cave
-                        { type: 'door', position: { x: 40, y: 1, z: 25 }, userData: { locked: true } },
-                        // Chest with reward
-                        { type: 'chest', position: { x: -20, y: 1, z: -15 } },
+                        // Ladders to mid-tier and high-tier
+                        { type: 'ladder', position: { x: 30, y: 7, z: -30 }, scale: { x: 1, y: 5, z: 1 } },
+                        { type: 'ladder', position: { x: -20, y: 14, z: 20 }, scale: { x: 1, y: 6, z: 1 } },
+                        // Lever for moving platform mp1
+                        { type: 'lever', position: { x: 15, y: 2, z: -25 }, userData: { platformId: 'mp1' } },
+                        // Button for moving platform mp2
+                        { type: 'button', position: { x: -10, y: 10, z: 15 }, userData: { platformId: 'mp2' } },
+                        // Door at peak
+                        { type: 'door', position: { x: 50, y: 30, z: 45 }, userData: { locked: true } },
+                        // Breakable barrel revealing key2
+                        { type: 'breakable', position: { x: -25, y: 10, z: 15 }, userData: { reveals: 'key2' } },
+                        // Chest in cave
+                        { type: 'chest', position: { x: 33, y: 5, z: -8 } },
                         // Bridge to cave
-                        { type: 'bridge', position: { x: 25, y: 2, z: 0 }, scale: { x: 5, y: 1, z: 2 }, rotation: { y: 90 } },
-                        // Flag as final goal
-                        { type: 'flag', position: { x: 45, y: 2, z: 35 } },
+                        { type: 'bridge', position: { x: 25, y: 5, z: -5 }, scale: { x: 6, y: 1, z: 2 }, rotation: { y: 90 } },
+                        // Flag at peak
+                        { type: 'flag', position: { x: 50, y: 32, z: 50 } },
                         // Signs for guidance
-                        { type: 'sign', position: { x: 0, y: 1, z: 5 }, rotation: { y: 180 } },
-                        { type: 'sign', position: { x: 20, y: 1, z: -5 }, rotation: { y: 45 } }
+                        { type: 'sign', position: { x: 0, y: 1, z: 0 }, rotation: { y: 180 } },
+                        { type: 'sign', position: { x: 20, y: 5, z: -20 }, rotation: { y: 45 } }
                     ]
                 };
             }
@@ -715,6 +765,7 @@
                 this.environment = [];
                 this.interactive = [];
                 this.movingPlatforms = [];
+                this.waterfallObjects = [];
                 this.totalCoins = 0;
                 this.unlockedDoors = [];
             }
@@ -726,6 +777,7 @@
                         platform.userData = platformData.userData || {};
                         this.platforms.push(platform);
                         if (platform.userData.id) this.movingPlatforms.push(platform);
+                        if (platformData.type === 'water-platform') this.waterfallObjects.push(platform);
                         this.scene.add(platform);
                     }
                 }
@@ -735,7 +787,14 @@
                 for (const collectibleData of this.levelData.collectibles) {
                     const collectible = await this.createObject('collectibles', collectibleData);
                     if (collectible) {
-                        collectible.userData = { type: collectibleData.type, collected: false, originalPosition: collectible.position.clone() };
+                        collectible.userData = { 
+                            type: collectibleData.type, 
+                            collected: collectibleData.userData?.collected || false, 
+                            visible: collectibleData.userData?.visible !== false,
+                            id: collectibleData.userData?.id,
+                            originalPosition: collectible.position.clone() 
+                        };
+                        if (!collectible.userData.visible) collectible.visible = false;
                         this.collectibles.push(collectible);
                         this.scene.add(collectible);
                     }
@@ -774,7 +833,10 @@
                             locked: interactiveData.userData?.locked || false, 
                             activated: false, 
                             opened: false,
-                            platformId: interactiveData.userData?.platformId
+                            broken: false,
+                            platformId: interactiveData.userData?.platformId,
+                            reveals: interactiveData.userData?.reveals,
+                            originalPosition: interactive.position.clone()
                         };
                         this.interactive.push(interactive);
                         this.scene.add(interactive);
@@ -810,18 +872,24 @@
             }
             getFallbackColor(type) {
                 const colorMap = {
-                    'grass': 0x4CAF50, 'platform': 0x9E9E9E, 'terrain-dirt': 0x4CAF50, 'terrain-rock': 0xD3D3D3, 'moving-platform': 0x2196F3,
-                    'coin-gold': 0xFFD700, 'coin-silver': 0xC0C0C0, 'coin-bronze': 0xCD7F32, 'heart': 0xFF69B4, 'jewel': 0x9C27B0, 'key': 0xFFC107,
-                    'spike': 0xFF5722, 'saw': 0xF44336, 'trap': 0xFF1744, 'bomb': 0x000000,
-                    'tree': 0x2E7D32, 'rocks': 0x5D4037, 'grass': 0x4CAF50, 'flowers': 0xE91E63, 'flowers-tall': 0xE91E63, 'hedge': 0x4CAF50, 'mushroom': 0xF4A460,
-                    'sign': 0x8B4513
+                    'grass': 0x4CAF50, 'grass-large': 0x4CAF50, 'grass-slope': 0x4CAF50, 'grass-tall': 0x4CAF50, 
+                    'platform': 0x9E9E9E, 'terrain-dirt': 0x4CAF50, 'terrain-rock': 0xD3D3D3, 
+                    'moving-platform': 0x2196F3, 'water-platform': 0xADD8E6,
+                    'coin-gold': 0xFFD700, 'coin-silver': 0xC0C0C0, 'coin-bronze': 0xCD7F32, 
+                    'heart': 0xFF69B4, 'jewel': 0x9C27B0, 'key': 0xFFC107,
+                    'spike': 0xFF5722, 'spike-wide': 0xFF5722, 'saw': 0xF44336, 'trap': 0xFF1744, 'bomb': 0x000000,
+                    'tree': 0x2E7D32, 'rocks': 0x5D4037, 'grass': 0x4CAF50, 'flowers': 0xE91E63, 
+                    'flowers-tall': 0xE91E63, 'hedge': 0x4CAF50, 'mushroom': 0xF4A460, 
+                    'stones': 0xA9A9A9, 'arrow': 0x8B4513,
+                    'sign': 0x8B4513, 'breakable': 0x8B4513
                 };
                 return colorMap[type] || 0x808080;
             }
             getFallbackGeometry(type) {
                 const geometryMap = { 
                     'heart': 'sphere', 'coin-gold': 'cylinder', 'coin-silver': 'cylinder', 'coin-bronze': 'cylinder', 
-                    'tree': 'cylinder', 'saw': 'cylinder', 'key': 'cylinder', 'jewel': 'sphere' 
+                    'tree': 'cylinder', 'saw': 'cylinder', 'key': 'cylinder', 'jewel': 'sphere', 
+                    'arrow': 'cylinder', 'breakable': 'cylinder'
                 };
                 return geometryMap[type] || 'box';
             }
@@ -840,7 +908,7 @@
             }
             update() {
                 this.collectibles.forEach(collectible => {
-                    if (!collectible.userData.collected) {
+                    if (!collectible.userData.collected && collectible.userData.visible) {
                         Utils.animateRotate(collectible, 0, 0.02, 0);
                         Utils.animateFloat(collectible, 0.005, 0.02);
                     }
@@ -862,6 +930,9 @@
                         );
                     }
                 });
+                this.waterfallObjects.forEach(obj => {
+                    Utils.animateWaterfall(obj, 0.05, 15);
+                });
             }
             getPlayerSpawnPosition() {
                 if (this.levelData && this.levelData.spawn) {
@@ -876,14 +947,15 @@
             checkLevelComplete() {
                 const goal = this.getLevelGoal();
                 if (goal.type === 'collect_keys') {
-                    return game.player.keysCollected >= (goal.count || 3);
+                    return game.player.keysCollected >= (goal.count || 4);
                 }
                 return false;
             }
             resetCollectibles() {
                 this.collectibles.forEach(collectible => {
-                    collectible.userData.collected = false;
-                    collectible.visible = true;
+                    collectible.userData.collected = collectible.userData.id ? (collectible.userData.id === 'key2') : false;
+                    collectible.userData.visible = collectible.userData.id ? (collectible.userData.id !== 'key2') : true;
+                    collectible.visible = collectible.userData.visible;
                     collectible.position.copy(collectible.userData.originalPosition);
                 });
                 this.interactive.forEach(obj => {
@@ -894,6 +966,10 @@
                     if (obj.userData.type === 'chest') {
                         obj.userData.opened = false;
                         obj.position.y = obj.userData.originalPosition ? obj.userData.originalPosition.y : obj.position.y - 0.5;
+                    }
+                    if (obj.userData.type === 'breakable') {
+                        obj.userData.broken = false;
+                        obj.visible = true;
                     }
                     if (obj.userData.type === 'door' && this.unlockedDoors.includes(obj)) {
                         obj.userData.locked = true;
@@ -964,10 +1040,14 @@
                     'assets/models/platforms/block-grass-large.glb',
                     'assets/models/platforms/block-grass-corner.glb',
                     'assets/models/platforms/block-grass-curve.glb',
+                    'assets/models/platforms/block-grass-large-slope.glb',
+                    'assets/models/platforms/block-snow-large-slope.glb',
+                    'assets/models/platforms/block-grass-large-tall.glb',
                     'assets/models/platforms/platform.glb',
                     'assets/models/platforms/platform-ramp.glb',
                     'assets/models/platforms/block-snow-large.glb',
                     'assets/models/platforms/block-moving.glb',
+                    'assets/models/platforms/block-moving-blue.glb',
                     'assets/models/collectibles/coin-gold.glb',
                     'assets/models/collectibles/coin-silver.glb',
                     'assets/models/collectibles/coin-bronze.glb',
@@ -982,12 +1062,16 @@
                     'assets/models/environment/flowers-tall.glb',
                     'assets/models/environment/hedge.glb',
                     'assets/models/environment/mushrooms.glb',
+                    'assets/models/environment/stones.glb',
+                    'assets/models/environment/arrow.glb',
                     'assets/models/interactive/crate.glb',
                     'assets/models/interactive/chest.glb',
                     'assets/models/interactive/button-square.glb',
                     'assets/models/interactive/door-rotate.glb',
                     'assets/models/interactive/lever.glb',
                     'assets/models/interactive/flag.glb',
+                    'assets/models/interactive/barrel.glb',
+                    'assets/models/interactive/spike-block-wide.glb',
                     'assets/models/hazards/spike-block.glb',
                     'assets/models/hazards/saw.glb',
                     'assets/models/hazards/trap-spikes-large.glb',
@@ -1001,7 +1085,7 @@
                 this.animationId = null;
             }
             async init() {
-                console.log('Initializing Canyon of Secrets...');
+                console.log('Initializing Mystic Mountain Ascent...');
                 try {
                     this.setupScene();
                     this.setupCamera();
@@ -1026,11 +1110,11 @@
             setupScene() {
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x87CEEB);
-                this.scene.fog = new THREE.Fog(0x87CEEB, 50, 200);
+                this.scene.fog = new THREE.Fog(0x87CEEB, 50, 300);
             }
             setupCamera() {
                 this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.set(0, 15, 20);
+                this.camera.position.set(0, 20, 30);
             }
             setupRenderer() {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -1042,21 +1126,21 @@
                 document.getElementById('gameContainer').appendChild(this.renderer.domElement);
             }
             setupLighting() {
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.7);
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
                 this.scene.add(ambientLight);
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
                 directionalLight.position.set(50, 50, 50);
                 directionalLight.castShadow = true;
                 directionalLight.shadow.mapSize.width = 2048;
                 directionalLight.shadow.mapSize.height = 2048;
                 directionalLight.shadow.camera.near = 0.5;
                 directionalLight.shadow.camera.far = 500;
-                directionalLight.shadow.camera.left = -100;
-                directionalLight.shadow.camera.right = 100;
-                directionalLight.shadow.camera.top = 100;
-                directionalLight.shadow.camera.bottom = -100;
+                directionalLight.shadow.camera.left = -150;
+                directionalLight.shadow.camera.right = 150;
+                directionalLight.shadow.camera.top = 150;
+                directionalLight.shadow.camera.bottom = -150;
                 this.scene.add(directionalLight);
-                const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.4);
+                const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.5);
                 fillLight.position.set(-30, 20, -30);
                 this.scene.add(fillLight);
             }
@@ -1166,13 +1250,14 @@
             levelComplete() {
                 Utils.showMessage(
                     'Level Complete!',
-                    `Congratulations! You conquered the Canyon of Secrets!\nFinal Score: ${this.gameState.score}`,
+                    `Congratulations! You conquered the Mystic Mountain Ascent!\nFinal Score: ${this.gameState.score}`,
                     'Play Again',
                     () => {
                         Utils.hideMessage();
                         this.restartGame();
                     }
                 );
+                this.gameState.isPlaying = false;
             }
             playerDied() {
                 if (this.gameState.lives <= 0) {
@@ -1185,6 +1270,7 @@
                             this.restartGame();
                         }
                     );
+                    this.gameState.isPlaying = false;
                 } else {
                     this.restartLevel();
                 }
@@ -1199,6 +1285,7 @@
                 this.updateUI();
             }
             restartGame() {
+                console.log('Restarting game...');
                 this.gameState.score = 0;
                 this.gameState.coins = 0;
                 this.gameState.lives = 3;
@@ -1206,6 +1293,15 @@
                 this.player.lives = 3;
                 this.player.isAlive = true;
                 this.loadLevel(1);
+            }
+            resumeGame() {
+                this.gameState.isPaused = false;
+                Utils.togglePauseMenu(false);
+                this.animate();
+            }
+            togglePause() {
+                this.gameState.isPaused = !this.gameState.isPaused;
+                Utils.togglePauseMenu(this.gameState.isPaused);
             }
             activatePlatform(platformId) {
                 this.level.activatePlatform(platformId);
@@ -1223,7 +1319,7 @@
                 Utils.updateUI('score', this.gameState.score);
                 Utils.updateUI('lives', this.player ? this.player.lives : this.gameState.lives);
                 Utils.updateUI('coins', this.gameState.coins);
-                Utils.updateUI('currentLevel', 'Canyon of Secrets');
+                Utils.updateUI('currentLevel', 'Mystic Mountain Ascent');
                 Utils.updateUI('keys', this.player ? this.player.keysCollected : 0);
             }
             onWindowResize() {
