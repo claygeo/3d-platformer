@@ -356,9 +356,10 @@
         </div>
     </div>
 
-    <!-- Three.js Core -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Three.js Core from unpkg (most reliable) -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <!-- GLTFLoader from unpkg (matches version) -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <script>
         // Enhanced Utility Functions
@@ -367,7 +368,7 @@
             
             loadModel(path, loader) {
                 return new Promise((resolve, reject) => {
-                    // For demo purposes, we'll create fallback geometries
+                    // If no loader available or for demo purposes, create fallback
                     const fallback = this.createFallbackFromPath(path);
                     this.loadedModels[path] = fallback;
                     resolve(fallback);
@@ -375,6 +376,8 @@
             },
 
             createFallbackFromPath(path) {
+                if (!path) return this.createBasicCube();
+                
                 const filename = path.split('/').pop().replace('.glb', '');
                 let geometry, material, mesh;
 
@@ -458,6 +461,15 @@
                 return mesh;
             },
 
+            createBasicCube() {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshLambertMaterial({ color: 0x808080 });
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                return mesh;
+            },
+
             cloneModel(path) {
                 if (!this.loadedModels[path]) return null;
                 return this.loadedModels[path].clone();
@@ -496,7 +508,7 @@
                 const time = Date.now() * speed;
                 const originalY = object.userData.originalY || object.position.y;
                 object.userData.originalY = originalY;
-                object.position.y = originalY + Math.sin(time) * amplitude;
+                object.position.y = originalY + Math.sin(time) * amplitude * 0.01;
             },
 
             animateRotate(object, speedX = 0, speedY = 0.02, speedZ = 0) {
@@ -1334,8 +1346,11 @@
                     return object;
                     
                 } catch (error) {
-                    console.warn(`Failed to create object: ${category}:${objectData.type}`);
-                    return null;
+                    console.warn(`Failed to create object: ${category}:${objectData.type}`, error);
+                    // Create a simple fallback as last resort
+                    const fallback = Utils.createBasicCube();
+                    this.applyTransformations(fallback, objectData);
+                    return fallback;
                 }
             }
             
@@ -1571,7 +1586,15 @@
             
             setupLoading() {
                 this.loadingManager = new THREE.LoadingManager();
-                this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
+                
+                // Check if GLTFLoader is available
+                if (typeof THREE.GLTFLoader !== 'undefined') {
+                    this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
+                    console.log('GLTFLoader initialized successfully');
+                } else {
+                    console.warn('GLTFLoader not available, using fallback geometry only');
+                    this.gltfLoader = null;
+                }
                 
                 this.loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
                     const progress = (itemsLoaded / itemsTotal) * 100;
@@ -1701,7 +1724,7 @@
                 } else {
                     Utils.showMessage(
                         'Demo Complete!',
-                        `Congratulations! You've mastered the enhanced 3D platformer!\\nFinal Score: ${this.gameState.score}\\n\\nThis demo showcases advanced camera controls and 3D level design.`,
+                        `Congratulations! You've mastered the enhanced 3D platformer!\nFinal Score: ${this.gameState.score}\n\nThis demo showcases advanced camera controls and 3D level design.`,
                         'Play Again',
                         () => {
                             Utils.hideMessage();
@@ -1716,7 +1739,7 @@
                 if (this.gameState.lives <= 0) {
                     Utils.showMessage(
                         'Game Over',
-                        `Better luck next time!\\nFinal Score: ${this.gameState.score}`,
+                        `Better luck next time!\nFinal Score: ${this.gameState.score}`,
                         'Restart',
                         () => {
                             Utils.hideMessage();
@@ -1803,6 +1826,22 @@
         const game = new Game();
         
         window.addEventListener('load', () => {
+            // Debug check to ensure GLTFLoader is available
+            console.log('THREE object:', THREE);
+            console.log('GLTFLoader available:', typeof THREE.GLTFLoader);
+            
+            if (typeof THREE.GLTFLoader === 'undefined') {
+                console.error('GLTFLoader not available! Check script loading.');
+                document.getElementById('loading').innerHTML = `
+                    <div class="loading-content">
+                        <h1>Loading Error</h1>
+                        <p>GLTFLoader failed to load. Game will use fallback geometry only.</p>
+                        <button onclick="game.init()" style="margin-top: 20px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Start Game Anyway</button>
+                    </div>
+                `;
+                return;
+            }
+            
             game.init();
         });
     </script>
