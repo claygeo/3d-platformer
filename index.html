@@ -75,10 +75,10 @@
         </div>
     </div>
 
-    <!-- Three.js Core -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- GLTFLoader for loading 3D models -->
-    <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Three.js Core from unpkg (most reliable) -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <!-- GLTFLoader from unpkg (matches version) -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     
     <!-- Game Scripts -->
     <script src="js/utils.js"></script>
@@ -87,6 +87,10 @@
     <script src="js/game.js"></script>
 
     <script>
+        // Debug check to ensure GLTFLoader is available
+        console.log('THREE object:', THREE);
+        console.log('GLTFLoader available:', typeof THREE.GLTFLoader);
+        
         // Initialize game when page loads
         window.addEventListener('load', () => {
             game.init();
