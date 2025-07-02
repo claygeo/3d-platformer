@@ -385,9 +385,24 @@
                 if (filename.includes('grass')) {
                     geometry = new THREE.BoxGeometry(2, 1, 2);
                     material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
+                } else if (filename.includes('stone')) {
+                    geometry = new THREE.BoxGeometry(2, 1, 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x616161 });
+                } else if (filename.includes('wood')) {
+                    geometry = new THREE.BoxGeometry(2, 1, 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('metal')) {
+                    geometry = new THREE.BoxGeometry(2, 1, 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x78909C });
+                } else if (filename.includes('snow')) {
+                    geometry = new THREE.BoxGeometry(2, 1, 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
                 } else if (filename.includes('platform')) {
                     geometry = new THREE.BoxGeometry(2, 0.5, 2);
                     material = new THREE.MeshLambertMaterial({ color: 0x9E9E9E });
+                } else if (filename.includes('bridge')) {
+                    geometry = new THREE.BoxGeometry(3, 0.2, 1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
                 }
                 // Collectibles
                 else if (filename.includes('coin')) {
@@ -402,28 +417,121 @@
                 } else if (filename.includes('jewel')) {
                     geometry = new THREE.OctahedronGeometry(0.4);
                     material = new THREE.MeshLambertMaterial({ color: 0x9C27B0 });
+                } else if (filename.includes('gem-blue')) {
+                    geometry = new THREE.OctahedronGeometry(0.3);
+                    material = new THREE.MeshLambertMaterial({ color: 0x2196F3 });
+                } else if (filename.includes('gem-red')) {
+                    geometry = new THREE.OctahedronGeometry(0.3);
+                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
+                } else if (filename.includes('gem-green')) {
+                    geometry = new THREE.OctahedronGeometry(0.3);
+                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
+                } else if (filename.includes('star')) {
+                    geometry = new THREE.SphereGeometry(0.4, 5, 5);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFFEB3B });
                 } else if (filename.includes('key')) {
                     geometry = new THREE.BoxGeometry(0.2, 0.6, 0.1);
                     material = new THREE.MeshLambertMaterial({ color: 0xFFC107 });
                 }
-                // Environment
-                else if (filename.includes('tree')) {
+                // Environment - Trees
+                else if (filename.includes('tree-pine')) {
+                    geometry = new THREE.ConeGeometry(1, 4, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x1B5E20 });
+                } else if (filename.includes('tree-oak')) {
+                    geometry = new THREE.CylinderGeometry(1.2, 0.3, 4, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x2E7D32 });
+                } else if (filename.includes('tree-palm')) {
+                    geometry = new THREE.CylinderGeometry(0.2, 0.3, 5, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
+                } else if (filename.includes('tree')) {
                     geometry = new THREE.CylinderGeometry(0.3, 0.5, 3, 8);
                     material = new THREE.MeshLambertMaterial({ color: 0x2E7D32 });
+                }
+                // Environment - Rocks
+                else if (filename.includes('rock-large')) {
+                    geometry = new THREE.SphereGeometry(1.2, 6, 6);
+                    material = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
+                } else if (filename.includes('rock-small')) {
+                    geometry = new THREE.SphereGeometry(0.4, 6, 6);
+                    material = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
                 } else if (filename.includes('rocks')) {
                     geometry = new THREE.SphereGeometry(0.8, 6, 6);
                     material = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
+                }
+                // Environment - Flora
+                else if (filename.includes('flower-red')) {
+                    geometry = new THREE.SphereGeometry(0.15, 8, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
+                } else if (filename.includes('flower-blue')) {
+                    geometry = new THREE.SphereGeometry(0.15, 8, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x2196F3 });
                 } else if (filename.includes('flowers')) {
                     geometry = new THREE.SphereGeometry(0.2, 8, 8);
                     material = new THREE.MeshLambertMaterial({ color: 0xE91E63 });
+                } else if (filename.includes('bush')) {
+                    geometry = new THREE.SphereGeometry(0.6, 8, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x388E3C });
+                } else if (filename.includes('mushroom-red')) {
+                    geometry = new THREE.CylinderGeometry(0.4, 0.1, 0.6, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
+                } else if (filename.includes('mushroom')) {
+                    geometry = new THREE.CylinderGeometry(0.3, 0.1, 0.4, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('grass')) {
+                    geometry = new THREE.PlaneGeometry(0.5, 0.5);
+                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
+                } else if (filename.includes('crystal')) {
+                    geometry = new THREE.OctahedronGeometry(0.8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x00BCD4 });
+                } else if (filename.includes('stone-pillar')) {
+                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x616161 });
+                } else if (filename.includes('log')) {
+                    geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 8);
+                    geometry.rotateZ(Math.PI / 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
                 }
                 // Interactive
-                else if (filename.includes('crate')) {
+                else if (filename.includes('crate-metal')) {
+                    geometry = new THREE.BoxGeometry(1, 1, 1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x607D8B });
+                } else if (filename.includes('crate')) {
                     geometry = new THREE.BoxGeometry(1, 1, 1);
                     material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('barrel')) {
+                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 12);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('chest-large')) {
+                    geometry = new THREE.BoxGeometry(1.5, 1, 1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x6D4C41 });
                 } else if (filename.includes('chest')) {
                     geometry = new THREE.BoxGeometry(1, 0.8, 0.6);
                     material = new THREE.MeshLambertMaterial({ color: 0x6D4C41 });
+                } else if (filename.includes('button')) {
+                    geometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
+                } else if (filename.includes('lever')) {
+                    geometry = new THREE.BoxGeometry(0.2, 1, 0.2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x795548 });
+                } else if (filename.includes('gate')) {
+                    geometry = new THREE.BoxGeometry(3, 2, 0.2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('flag-banner')) {
+                    const group = new THREE.Group();
+                    const pole = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.05, 0.05, 3),
+                        new THREE.MeshLambertMaterial({ color: 0x8D6E63 })
+                    );
+                    const banner = new THREE.Mesh(
+                        new THREE.PlaneGeometry(1.5, 0.8),
+                        new THREE.MeshLambertMaterial({ color: 0x673AB7 })
+                    );
+                    banner.position.set(0.75, 1.5, 0);
+                    group.add(pole);
+                    group.add(banner);
+                    group.castShadow = true;
+                    group.receiveShadow = true;
+                    return group;
                 } else if (filename.includes('flag')) {
                     const group = new THREE.Group();
                     const pole = new THREE.Mesh(
@@ -440,14 +548,84 @@
                     group.castShadow = true;
                     group.receiveShadow = true;
                     return group;
+                } else if (filename.includes('sign')) {
+                    geometry = new THREE.BoxGeometry(1, 0.6, 0.1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('torch')) {
+                    geometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('lantern')) {
+                    geometry = new THREE.SphereGeometry(0.3, 8, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFFEB3B });
                 }
                 // Hazards
-                else if (filename.includes('spike')) {
+                else if (filename.includes('spike-ball')) {
+                    geometry = new THREE.SphereGeometry(0.5, 8, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
+                } else if (filename.includes('spike')) {
                     geometry = new THREE.ConeGeometry(0.5, 1, 4);
                     material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
+                } else if (filename.includes('saw-blade')) {
+                    geometry = new THREE.CylinderGeometry(1, 1, 0.1, 16);
+                    material = new THREE.MeshLambertMaterial({ color: 0x607D8B });
                 } else if (filename.includes('saw')) {
                     geometry = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 12);
                     material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
+                } else if (filename.includes('bomb')) {
+                    geometry = new THREE.SphereGeometry(0.4, 8, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x212121 });
+                } else if (filename.includes('lava')) {
+                    geometry = new THREE.PlaneGeometry(2, 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
+                } else if (filename.includes('fire')) {
+                    geometry = new THREE.ConeGeometry(0.3, 1, 6);
+                    material = new THREE.MeshLambertMaterial({ color: 0xFF9800 });
+                } else if (filename.includes('crusher')) {
+                    geometry = new THREE.BoxGeometry(2, 1, 2);
+                    material = new THREE.MeshLambertMaterial({ color: 0x424242 });
+                }
+                // Structures  
+                else if (filename.includes('fence')) {
+                    geometry = new THREE.BoxGeometry(2, 1, 0.1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('ladder')) {
+                    geometry = new THREE.BoxGeometry(0.8, 2, 0.1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('column') || filename.includes('pillar')) {
+                    geometry = new THREE.CylinderGeometry(0.4, 0.4, 4, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x9E9E9E });
+                } else if (filename.includes('wall')) {
+                    geometry = new THREE.BoxGeometry(2, 3, 0.5);
+                    material = new THREE.MeshLambertMaterial({ color: 0x795548 });
+                } else if (filename.includes('poles')) {
+                    geometry = new THREE.CylinderGeometry(0.1, 0.1, 2, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                }
+                // Decorations
+                else if (filename.includes('banner')) {
+                    geometry = new THREE.PlaneGeometry(1, 1.5);
+                    material = new THREE.MeshLambertMaterial({ color: 0x673AB7 });
+                } else if (filename.includes('statue')) {
+                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x9E9E9E });
+                } else if (filename.includes('fountain')) {
+                    geometry = new THREE.CylinderGeometry(1, 1, 0.5, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x81C784 });
+                } else if (filename.includes('campfire')) {
+                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('tent')) {
+                    geometry = new THREE.ConeGeometry(1, 1.5, 4);
+                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
+                } else if (filename.includes('windmill')) {
+                    geometry = new THREE.CylinderGeometry(0.5, 0.7, 3, 8);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+                } else if (filename.includes('well')) {
+                    geometry = new THREE.CylinderGeometry(0.8, 0.8, 1, 12);
+                    material = new THREE.MeshLambertMaterial({ color: 0x795548 });
+                } else if (filename.includes('cart')) {
+                    geometry = new THREE.BoxGeometry(1.5, 0.5, 1);
+                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
                 }
                 // Default
                 else {
@@ -875,20 +1053,21 @@
             updateMovement() {
                 const currentSpeed = this.keys.shift ? this.speed * 1.5 : this.speed;
                 
-                if (this.keys.left) {
-                    this.velocity.x = -currentSpeed;
-                } else if (this.keys.right) {
-                    this.velocity.x = currentSpeed;
-                } else {
-                    this.velocity.x *= 0.8;
-                }
-                
+                // Fixed movement: W/S for forward/backward (Z-axis), A/D for left/right (X-axis)
                 if (this.keys.forward) {
                     this.velocity.z = -currentSpeed;
                 } else if (this.keys.backward) {
                     this.velocity.z = currentSpeed;
                 } else {
                     this.velocity.z *= 0.8;
+                }
+                
+                if (this.keys.left) {
+                    this.velocity.x = -currentSpeed;
+                } else if (this.keys.right) {
+                    this.velocity.x = currentSpeed;
+                } else {
+                    this.velocity.x *= 0.8;
                 }
                 
                 if (this.keys.space && this.isGrounded && !this.isJumping) {
@@ -1101,7 +1280,13 @@
                         'grass-corner': 'assets/models/platforms/block-grass-corner.glb',
                         'grass-curve': 'assets/models/platforms/block-grass-curve.glb',
                         'platform': 'assets/models/platforms/platform.glb',
-                        'platform-ramp': 'assets/models/platforms/platform-ramp.glb'
+                        'platform-ramp': 'assets/models/platforms/platform-ramp.glb',
+                        'stone': 'assets/models/platforms/block-stone.glb',
+                        'wood': 'assets/models/platforms/block-wood.glb',
+                        'metal': 'assets/models/platforms/block-metal.glb',
+                        'snow': 'assets/models/platforms/block-snow.glb',
+                        'bridge': 'assets/models/platforms/bridge.glb',
+                        'moving': 'assets/models/platforms/platform-moving.glb'
                     },
                     collectibles: {
                         'coin-gold': 'assets/models/collectibles/coin-gold.glb',
@@ -1109,24 +1294,85 @@
                         'coin-bronze': 'assets/models/collectibles/coin-bronze.glb',
                         'heart': 'assets/models/collectibles/heart.glb',
                         'jewel': 'assets/models/collectibles/jewel.glb',
-                        'key': 'assets/models/collectibles/key.glb'
+                        'key': 'assets/models/collectibles/key.glb',
+                        'gem-blue': 'assets/models/collectibles/gem-blue.glb',
+                        'gem-red': 'assets/models/collectibles/gem-red.glb',
+                        'gem-green': 'assets/models/collectibles/gem-green.glb',
+                        'star': 'assets/models/collectibles/star.glb',
+                        'power-up': 'assets/models/collectibles/power-up.glb'
                     },
                     environment: {
                         'tree': 'assets/models/environment/tree.glb',
                         'tree-pine': 'assets/models/environment/tree-pine.glb',
+                        'tree-oak': 'assets/models/environment/tree-oak.glb',
+                        'tree-palm': 'assets/models/environment/tree-palm.glb',
                         'rocks': 'assets/models/environment/rocks.glb',
+                        'rock-large': 'assets/models/environment/rock-large.glb',
+                        'rock-small': 'assets/models/environment/rock-small.glb',
                         'grass': 'assets/models/environment/grass.glb',
-                        'flowers': 'assets/models/environment/flowers.glb'
+                        'grass-patch': 'assets/models/environment/grass-patch.glb',
+                        'flowers': 'assets/models/environment/flowers.glb',
+                        'flower-red': 'assets/models/environment/flower-red.glb',
+                        'flower-blue': 'assets/models/environment/flower-blue.glb',
+                        'bush': 'assets/models/environment/bush.glb',
+                        'mushroom': 'assets/models/environment/mushroom.glb',
+                        'mushroom-red': 'assets/models/environment/mushroom-red.glb',
+                        'crystal': 'assets/models/environment/crystal.glb',
+                        'stone-pillar': 'assets/models/environment/stone-pillar.glb',
+                        'log': 'assets/models/environment/log.glb'
                     },
                     interactive: {
                         'crate': 'assets/models/interactive/crate.glb',
+                        'crate-metal': 'assets/models/interactive/crate-metal.glb',
+                        'barrel': 'assets/models/interactive/barrel.glb',
                         'chest': 'assets/models/interactive/chest.glb',
+                        'chest-large': 'assets/models/interactive/chest-large.glb',
                         'button': 'assets/models/interactive/button-round.glb',
-                        'flag': 'assets/models/interactive/flag.glb'
+                        'button-square': 'assets/models/interactive/button-square.glb',
+                        'lever': 'assets/models/interactive/lever.glb',
+                        'door': 'assets/models/interactive/door-rotate.glb',
+                        'gate': 'assets/models/interactive/gate.glb',
+                        'flag': 'assets/models/interactive/flag.glb',
+                        'flag-banner': 'assets/models/interactive/flag-banner.glb',
+                        'sign': 'assets/models/interactive/sign.glb',
+                        'signpost': 'assets/models/interactive/signpost.glb',
+                        'torch': 'assets/models/interactive/torch.glb',
+                        'lantern': 'assets/models/interactive/lantern.glb'
                     },
                     hazards: {
                         'spike': 'assets/models/hazards/spike-block.glb',
-                        'saw': 'assets/models/hazards/saw.glb'
+                        'spike-ball': 'assets/models/hazards/spike-ball.glb',
+                        'saw': 'assets/models/hazards/saw.glb',
+                        'saw-blade': 'assets/models/hazards/saw-blade.glb',
+                        'trap': 'assets/models/hazards/trap-spikes.glb',
+                        'bomb': 'assets/models/hazards/bomb.glb',
+                        'lava': 'assets/models/hazards/lava.glb',
+                        'fire': 'assets/models/hazards/fire.glb',
+                        'crusher': 'assets/models/hazards/crusher.glb'
+                    },
+                    structures: {
+                        'fence': 'assets/models/structures/fence-low-straight.glb',
+                        'fence-corner': 'assets/models/structures/fence-corner.glb',
+                        'fence-gate': 'assets/models/structures/fence-gate.glb',
+                        'ladder': 'assets/models/structures/ladder.glb',
+                        'ladder-long': 'assets/models/structures/ladder-long.glb',
+                        'poles': 'assets/models/structures/poles.glb',
+                        'column': 'assets/models/structures/column.glb',
+                        'pillar': 'assets/models/structures/pillar.glb',
+                        'bridge-rope': 'assets/models/structures/bridge-rope.glb',
+                        'bridge-stone': 'assets/models/structures/bridge-stone.glb',
+                        'wall': 'assets/models/structures/wall.glb',
+                        'wall-corner': 'assets/models/structures/wall-corner.glb'
+                    },
+                    decorations: {
+                        'banner': 'assets/models/decorations/banner.glb',
+                        'statue': 'assets/models/decorations/statue.glb',
+                        'fountain': 'assets/models/decorations/fountain.glb',
+                        'campfire': 'assets/models/decorations/campfire.glb',
+                        'tent': 'assets/models/decorations/tent.glb',
+                        'windmill': 'assets/models/decorations/windmill.glb',
+                        'well': 'assets/models/decorations/well.glb',
+                        'cart': 'assets/models/decorations/cart.glb'
                     }
                 };
             }
@@ -1154,134 +1400,219 @@
                 switch(levelNumber) {
                     case 1:
                         return {
-                            name: "Floating Gardens - Enhanced",
+                            name: "Enchanted Garden Towers",
                             spawn: { x: 0, y: 5, z: 0 },
                             platforms: [
-                                // Starting area
-                                { type: "grass", position: { x: 0, y: 0, z: 0 }, scale: { x: 3, y: 1, z: 3 } },
+                                // Starting garden area
+                                { type: "grass", position: { x: 0, y: 0, z: 0 }, scale: { x: 4, y: 1, z: 4 } },
+                                { type: "grass", position: { x: -4, y: 0, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass", position: { x: 4, y: 0, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
                                 
-                                // Spiral tower - main feature requiring camera rotation
-                                { type: "grass", position: { x: 8, y: 2, z: 0 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-corner", position: { x: 12, y: 4, z: 4 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass", position: { x: 8, y: 6, z: 8 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-corner", position: { x: 4, y: 8, z: 4 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass", position: { x: 8, y: 10, z: 0 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-large", position: { x: 8, y: 12, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
+                                // Main spiral tower requiring camera rotation
+                                { type: "grass", position: { x: 8, y: 2, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
+                                { type: "grass-corner", position: { x: 12, y: 4, z: 4 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass", position: { x: 8, y: 6, z: 8 }, scale: { x: 2.5, y: 1, z: 2.5 } },
+                                { type: "grass-corner", position: { x: 4, y: 8, z: 4 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass", position: { x: 8, y: 10, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
+                                { type: "grass-corner", position: { x: 12, y: 12, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass-large", position: { x: 8, y: 14, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
                                 
-                                // Hidden paths requiring camera movement
-                                { type: "platform", position: { x: -6, y: 3, z: 6 }, scale: { x: 1.5, y: 0.5, z: 1.5 } },
-                                { type: "platform", position: { x: -8, y: 5, z: -8 }, scale: { x: 1.5, y: 0.5, z: 1.5 } },
-                                { type: "grass-curve", position: { x: 16, y: 6, z: -6 }, scale: { x: 1.5, y: 1, z: 1.5 } },
+                                // Hidden garden paths requiring camera movement
+                                { type: "wood", position: { x: -8, y: 3, z: 6 }, scale: { x: 2, y: 0.5, z: 2 } },
+                                { type: "wood", position: { x: -12, y: 5, z: -8 }, scale: { x: 2, y: 0.5, z: 2 } },
+                                { type: "stone", position: { x: 18, y: 6, z: -10 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass-curve", position: { x: 16, y: 8, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
                                 
-                                // Vertical challenge section
-                                { type: "grass", position: { x: 20, y: 2, z: 0 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass", position: { x: 22, y: 5, z: 3 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass", position: { x: 20, y: 8, z: 6 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass", position: { x: 18, y: 11, z: 3 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass-large", position: { x: 20, y: 14, z: 0 }, scale: { x: 2, y: 1, z: 2 } },
+                                // Vertical garden climbing section
+                                { type: "grass", position: { x: 22, y: 2, z: 2 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass", position: { x: 24, y: 5, z: 5 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass", position: { x: 22, y: 8, z: 8 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass", position: { x: 20, y: 11, z: 5 }, scale: { x: 2, y: 1, z: 2 } },
+                                { type: "grass-large", position: { x: 22, y: 16, z: 2 }, scale: { x: 3, y: 1, z: 3 } },
                                 
-                                // Moving platforms
-                                { type: "platform", position: { x: 15, y: 8, z: 0 }, scale: { x: 1.5, y: 0.5, z: 1.5 }, moving: true, path: [
-                                    { x: 15, y: 8, z: 0 }, { x: 15, y: 8, z: 6 }, { x: 15, y: 8, z: 0 }
+                                // Moving wooden bridges
+                                { type: "bridge", position: { x: 15, y: 9, z: 2 }, scale: { x: 2, y: 0.3, z: 1 }, moving: true, path: [
+                                    { x: 15, y: 9, z: 2 }, { x: 15, y: 9, z: 8 }, { x: 15, y: 9, z: 2 }
                                 ]},
-                                { type: "platform", position: { x: 12, y: 12, z: -2 }, scale: { x: 1.5, y: 0.5, z: 1.5 }, moving: true, path: [
-                                    { x: 12, y: 12, z: -2 }, { x: 6, y: 12, z: -2 }, { x: 12, y: 12, z: -2 }
+                                { type: "bridge", position: { x: 10, y: 13, z: -6 }, scale: { x: 2, y: 0.3, z: 1 }, moving: true, path: [
+                                    { x: 10, y: 13, z: -6 }, { x: 4, y: 13, z: -6 }, { x: 10, y: 13, z: -6 }
                                 ]}
                             ],
                             collectibles: [
-                                // Coins along the spiral
+                                // Spiral tower coins
                                 { type: "coin-gold", position: { x: 10, y: 3, z: 2 } },
-                                { type: "coin-gold", position: { x: 10, y: 7, z: 6 } },
-                                { type: "coin-gold", position: { x: 6, y: 9, z: 2 } },
-                                { type: "coin-silver", position: { x: 10, y: 11, z: -2 } },
-                                { type: "coin-gold", position: { x: 10, y: 13, z: -6 } },
+                                { type: "coin-gold", position: { x: 14, y: 5, z: 6 } },
+                                { type: "coin-silver", position: { x: 10, y: 7, z: 10 } },
+                                { type: "coin-gold", position: { x: 6, y: 9, z: 6 } },
+                                { type: "coin-gold", position: { x: 10, y: 11, z: 2 } },
+                                { type: "coin-silver", position: { x: 14, y: 13, z: -2 } },
+                                { type: "star", position: { x: 8, y: 17, z: -8 } },
                                 
-                                // Hidden collectibles
-                                { type: "jewel", position: { x: -6, y: 6, z: 6 } },
-                                { type: "key", position: { x: -8, y: 8, z: -8 } },
-                                { type: "heart", position: { x: 16, y: 9, z: -6 } },
+                                // Hidden gems requiring camera exploration
+                                { type: "gem-blue", position: { x: -8, y: 6, z: 6 } },
+                                { type: "gem-red", position: { x: -12, y: 8, z: -8 } },
+                                { type: "gem-green", position: { x: 18, y: 9, z: -10 } },
+                                { type: "jewel", position: { x: 16, y: 11, z: -6 } },
                                 
                                 // Vertical challenge rewards
-                                { type: "coin-gold", position: { x: 22, y: 8, z: 3 } },
-                                { type: "coin-gold", position: { x: 20, y: 11, z: 6 } },
-                                { type: "jewel", position: { x: 20, y: 17, z: 0 } }
+                                { type: "coin-gold", position: { x: 24, y: 8, z: 5 } },
+                                { type: "coin-gold", position: { x: 22, y: 11, z: 8 } },
+                                { type: "heart", position: { x: 22, y: 19, z: 2 } },
+                                
+                                // Secret areas
+                                { type: "key", position: { x: -4, y: 3, z: -4 } },
+                                { type: "power-up", position: { x: 4, y: 3, z: -4 } }
                             ],
                             environment: [
-                                // Trees creating visual barriers requiring camera movement
-                                { type: "tree", position: { x: 4, y: 0, z: -8 }, scale: { x: 1.2, y: 1.2, z: 1.2 } },
-                                { type: "tree-pine", position: { x: -4, y: 0, z: 8 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "tree", position: { x: 12, y: 6, z: -10 }, scale: { x: 1.5, y: 1.5, z: 1.5 } },
+                                // Diverse tree forest creating visual barriers
+                                { type: "tree-oak", position: { x: 6, y: 0, z: -12 }, scale: { x: 1.2, y: 1.2, z: 1.2 } },
+                                { type: "tree-pine", position: { x: -6, y: 0, z: 10 }, scale: { x: 1.5, y: 1.5, z: 1.5 } },
+                                { type: "tree", position: { x: 14, y: 6, z: -14 }, scale: { x: 1.3, y: 1.3, z: 1.3 } },
+                                { type: "tree-palm", position: { x: -10, y: 0, z: -12 }, scale: { x: 1, y: 1, z: 1 } },
                                 
-                                // Environmental decoration
-                                { type: "flowers", position: { x: 2, y: 1, z: 2 }, scale: { x: 0.8, y: 0.8, z: 0.8 } },
-                                { type: "rocks", position: { x: -2, y: 1, z: -3 }, scale: { x: 0.6, y: 0.6, z: 0.6 } },
-                                { type: "grass", position: { x: 6, y: 2, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
+                                // Rich flora decoration
+                                { type: "flowers", position: { x: 2, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "flower-red", position: { x: -2, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "flower-blue", position: { x: 2, y: 1, z: -2 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "bush", position: { x: -2, y: 1, z: -2 }, scale: { x: 1.2, y: 1.2, z: 1.2 } },
                                 
-                                // Around the spiral
-                                { type: "flowers", position: { x: 14, y: 4, z: 2 }, scale: { x: 0.9, y: 0.9, z: 0.9 } },
-                                { type: "rocks", position: { x: 6, y: 8, z: 10 }, scale: { x: 0.7, y: 0.7, z: 0.7 } },
-                                { type: "tree-pine", position: { x: 24, y: 14, z: 4 }, scale: { x: 1.3, y: 1.3, z: 1.3 } }
+                                // Varied rocks and stones
+                                { type: "rock-large", position: { x: -3, y: 1, z: -8 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "rock-small", position: { x: 3, y: 1, z: -8 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "rocks", position: { x: 0, y: 1, z: -10 }, scale: { x: 0.8, y: 0.8, z: 0.8 } },
+                                
+                                // Magical elements
+                                { type: "crystal", position: { x: 16, y: 2, z: 8 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "mushroom-red", position: { x: 6, y: 1, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "mushroom", position: { x: 10, y: 1, z: 6 }, scale: { x: 0.8, y: 0.8, z: 0.8 } },
+                                
+                                // Ground decoration
+                                { type: "grass-patch", position: { x: 12, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "log", position: { x: -6, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } }
                             ],
                             interactive: [
-                                { type: "flag", position: { x: 20, y: 17, z: 0 }, action: "level_complete" },
-                                { type: "crate", position: { x: 8, y: 13, z: -2 } },
-                                { type: "chest", position: { x: -6, y: 4, z: 6 } }
+                                { type: "flag-banner", position: { x: 22, y: 19, z: 2 }, action: "level_complete" },
+                                { type: "chest-large", position: { x: 8, y: 15, z: -8 } },
+                                { type: "crate", position: { x: 10, y: 15, z: -6 } },
+                                { type: "torch", position: { x: 6, y: 15, z: -8 } },
+                                { type: "sign", position: { x: 2, y: 1, z: 0 } },
+                                { type: "lantern", position: { x: -8, y: 4, z: 6 } }
+                            ],
+                            structures: [
+                                { type: "fence", position: { x: -6, y: 1, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "fence-corner", position: { x: -6, y: 1, z: -2 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "ladder", position: { x: 8, y: 8, z: 0 }, scale: { x: 1, y: 1.5, z: 1 } },
+                                { type: "pillar", position: { x: 26, y: 8, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "bridge-stone", position: { x: 6, y: 4, z: 6 }, scale: { x: 1, y: 1, z: 1 } }
+                            ],
+                            decorations: [
+                                { type: "statue", position: { x: 0, y: 1, z: -6 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "fountain", position: { x: 0, y: 1, z: 6 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "campfire", position: { x: -4, y: 1, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "banner", position: { x: 8, y: 8, z: -3 }, scale: { x: 1, y: 1, z: 1 } }
                             ],
                             hazards: [
-                                { type: "spike", position: { x: 10, y: 2, z: -2 }, damage: 1 },
-                                { type: "saw", position: { x: 14, y: 9, z: 4 }, damage: 1 }
+                                { type: "spike", position: { x: 11, y: 2, z: -2 }, damage: 1 },
+                                { type: "saw-blade", position: { x: 16, y: 10, z: 6 }, damage: 1 },
+                                { type: "spike-ball", position: { x: 13, y: 7, z: -1 }, damage: 1 }
                             ]
                         };
                     case 2:
                         return {
-                            name: "Industrial Maze - Enhanced",
+                            name: "Industrial Sky City",
                             spawn: { x: 0, y: 5, z: 0 },
                             platforms: [
-                                // Multi-level industrial complex
-                                { type: "platform", position: { x: 0, y: 0, z: 0 }, scale: { x: 3, y: 1, z: 3 } },
+                                // Industrial starting platform
+                                { type: "metal", position: { x: 0, y: 0, z: 0 }, scale: { x: 4, y: 1, z: 4 } },
                                 
-                                // Lower level maze
-                                { type: "platform", position: { x: 6, y: 2, z: 0 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "platform", position: { x: 6, y: 2, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "platform", position: { x: 0, y: 2, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "platform", position: { x: -6, y: 2, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "platform", position: { x: -6, y: 2, z: 0 }, scale: { x: 2, y: 1, z: 2 } },
+                                // Lower industrial maze
+                                { type: "metal", position: { x: 8, y: 2, z: 0 }, scale: { x: 3, y: 1, z: 3 } },
+                                { type: "metal", position: { x: 8, y: 2, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
+                                { type: "metal", position: { x: 0, y: 2, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
+                                { type: "metal", position: { x: -8, y: 2, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
+                                { type: "metal", position: { x: -8, y: 2, z: 0 }, scale: { x: 3, y: 1, z: 3 } },
                                 
-                                // Mid level with bridges
-                                { type: "grass-corner", position: { x: 12, y: 6, z: 0 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass-corner", position: { x: 12, y: 6, z: -12 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass-corner", position: { x: -12, y: 6, z: -12 }, scale: { x: 1.5, y: 1, z: 1.5 } },
-                                { type: "grass-corner", position: { x: -12, y: 6, z: 0 }, scale: { x: 1.5, y: 1, z: 1.5 } },
+                                // Mid-level factory floor
+                                { type: "stone", position: { x: 16, y: 6, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
+                                { type: "stone", position: { x: 16, y: 6, z: -16 }, scale: { x: 2.5, y: 1, z: 2.5 } },
+                                { type: "stone", position: { x: -16, y: 6, z: -16 }, scale: { x: 2.5, y: 1, z: 2.5 } },
+                                { type: "stone", position: { x: -16, y: 6, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
                                 
-                                // Upper level towers
-                                { type: "grass-large", position: { x: 18, y: 12, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-large", position: { x: -18, y: 12, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
+                                // Upper industrial towers
+                                { type: "metal", position: { x: 24, y: 12, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
+                                { type: "metal", position: { x: -24, y: 12, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
                                 
-                                // Final platform
-                                { type: "grass-large", position: { x: 0, y: 18, z: -6 }, scale: { x: 3, y: 1, z: 3 } }
+                                // Sky bridges
+                                { type: "bridge", position: { x: 12, y: 9, z: -8 }, scale: { x: 1, y: 0.3, z: 3 } },
+                                { type: "bridge", position: { x: -12, y: 9, z: -8 }, scale: { x: 1, y: 0.3, z: 3 } },
+                                { type: "bridge", position: { x: 0, y: 15, z: -8 }, scale: { x: 4, y: 0.5, z: 2 } },
+                                
+                                // Final sky platform
+                                { type: "stone", position: { x: 0, y: 20, z: -8 }, scale: { x: 4, y: 1, z: 4 } },
+                                
+                                // Moving industrial platforms
+                                { type: "moving", position: { x: 4, y: 4, z: -4 }, scale: { x: 2, y: 0.5, z: 2 }, moving: true, path: [
+                                    { x: 4, y: 4, z: -4 }, { x: -4, y: 4, z: -4 }, { x: 4, y: 4, z: -4 }
+                                ]},
+                                { type: "moving", position: { x: 20, y: 9, z: -8 }, scale: { x: 2, y: 0.5, z: 2 }, moving: true, path: [
+                                    { x: 20, y: 9, z: -8 }, { x: 20, y: 9, z: -16 }, { x: 20, y: 9, z: -8 }
+                                ]}
                             ],
                             collectibles: [
-                                { type: "coin-gold", position: { x: 6, y: 5, z: -3 } },
-                                { type: "coin-silver", position: { x: 0, y: 5, z: -6 } },
-                                { type: "coin-gold", position: { x: -6, y: 5, z: -3 } },
-                                { type: "jewel", position: { x: 12, y: 9, z: -6 } },
-                                { type: "key", position: { x: -12, y: 9, z: -6 } },
+                                // Industrial collectibles
+                                { type: "coin-silver", position: { x: 8, y: 5, z: -4 } },
+                                { type: "coin-gold", position: { x: 0, y: 5, z: -8 } },
+                                { type: "coin-silver", position: { x: -8, y: 5, z: -4 } },
+                                { type: "gem-blue", position: { x: 16, y: 9, z: -8 } },
+                                { type: "gem-red", position: { x: -16, y: 9, z: -8 } },
+                                { type: "key", position: { x: 24, y: 15, z: -8 } },
+                                { type: "key", position: { x: -24, y: 15, z: -8 } },
+                                { type: "star", position: { x: 0, y: 23, z: -8 } },
+                                { type: "power-up", position: { x: 2, y: 3, z: 2 } },
                                 { type: "heart", position: { x: 0, y: 21, z: -6 } }
                             ],
                             environment: [
-                                { type: "rocks", position: { x: 3, y: 2, z: 3 } },
-                                { type: "rocks", position: { x: -3, y: 2, z: -9 } },
-                                { type: "tree-pine", position: { x: 20, y: 12, z: -10 } },
-                                { type: "tree-pine", position: { x: -20, y: 12, z: -2 } }
+                                // Industrial structures
+                                { type: "rock-large", position: { x: 5, y: 2, z: 5 } },
+                                { type: "rock-small", position: { x: -5, y: 2, z: 5 } },
+                                { type: "crystal", position: { x: 12, y: 6, z: -12 } },
+                                { type: "crystal", position: { x: -12, y: 6, z: -12 } },
+                                
+                                // Sparse vegetation in industrial setting
+                                { type: "bush", position: { x: 28, y: 12, z: -6 } },
+                                { type: "grass-patch", position: { x: -28, y: 12, z: -10 } }
                             ],
                             interactive: [
-                                { type: "flag", position: { x: 0, y: 21, z: -6 }, action: "level_complete" }
+                                { type: "flag-banner", position: { x: 0, y: 23, z: -8 }, action: "level_complete" },
+                                { type: "crate-metal", position: { x: 2, y: 21, z: -6 } },
+                                { type: "crate-metal", position: { x: -2, y: 21, z: -6 } },
+                                { type: "barrel", position: { x: 8, y: 3, z: 2 } },
+                                { type: "barrel", position: { x: -8, y: 3, z: 2 } },
+                                { type: "lever", position: { x: 16, y: 7, z: 2 } },
+                                { type: "button-square", position: { x: -16, y: 7, z: 2 } },
+                                { type: "torch", position: { x: 24, y: 13, z: -6 } },
+                                { type: "torch", position: { x: -24, y: 13, z: -6 } }
+                            ],
+                            structures: [
+                                { type: "ladder-long", position: { x: 20, y: 6, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
+                                { type: "ladder-long", position: { x: -20, y: 6, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
+                                { type: "column", position: { x: 4, y: 10, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
+                                { type: "column", position: { x: -4, y: 10, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
+                                { type: "wall", position: { x: 12, y: 4, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "wall", position: { x: -12, y: 4, z: 4 }, scale: { x: 1, y: 1, z: 1 } }
+                            ],
+                            decorations: [
+                                { type: "windmill", position: { x: 30, y: 12, z: -8 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "well", position: { x: 0, y: 1, z: 8 }, scale: { x: 1, y: 1, z: 1 } },
+                                { type: "cart", position: { x: 6, y: 1, z: 6 }, scale: { x: 1, y: 1, z: 1 } }
                             ],
                             hazards: [
-                                { type: "spike", position: { x: 3, y: 2, z: -3 }, damage: 1 },
-                                { type: "spike", position: { x: -3, y: 2, z: -3 }, damage: 1 },
-                                { type: "saw", position: { x: 9, y: 6, z: -6 }, damage: 1 },
-                                { type: "saw", position: { x: -9, y: 6, z: -6 }, damage: 1 }
+                                { type: "crusher", position: { x: 4, y: 3, z: -4 }, damage: 1 },
+                                { type: "crusher", position: { x: -4, y: 3, z: -4 }, damage: 1 },
+                                { type: "saw-blade", position: { x: 12, y: 7, z: -8 }, damage: 1 },
+                                { type: "saw-blade", position: { x: -12, y: 7, z: -8 }, damage: 1 },
+                                { type: "fire", position: { x: 8, y: 3, z: -12 }, damage: 1 },
+                                { type: "fire", position: { x: -8, y: 3, z: -12 }, damage: 1 }
                             ]
                         };
                     default:
@@ -1290,12 +1621,12 @@
             }
             
             async createLevelObjects(levelData) {
-                for (const category of ['platforms', 'collectibles', 'environment', 'interactive', 'hazards']) {
+                for (const category of ['platforms', 'collectibles', 'environment', 'interactive', 'hazards', 'structures', 'decorations']) {
                     if (levelData[category]) {
                         for (const objectData of levelData[category]) {
                             const object = await this.createObject(category, objectData);
                             if (object) {
-                                this[category].push(object);
+                                this[category === 'structures' || category === 'decorations' ? 'environment' : category].push(object);
                                 this.scene.add(object);
                                 
                                 // Handle moving platforms
@@ -1607,12 +1938,24 @@
             }
             
             async loadAssets() {
-                // For demo purposes, we'll simulate asset loading
-                for (let i = 0; i <= 100; i += 10) {
-                    Utils.updateLoadingProgress(i);
-                    await new Promise(resolve => setTimeout(resolve, 50));
+                // Enhanced asset loading simulation with more realistic timing
+                const steps = [
+                    { progress: 10, message: 'Loading platform models...' },
+                    { progress: 25, message: 'Loading collectibles...' },
+                    { progress: 40, message: 'Loading environment assets...' },
+                    { progress: 55, message: 'Loading interactive objects...' },
+                    { progress: 70, message: 'Loading hazards and effects...' },
+                    { progress: 85, message: 'Loading structures and decorations...' },
+                    { progress: 100, message: 'Finalizing enhanced experience...' }
+                ];
+                
+                for (const step of steps) {
+                    Utils.updateLoadingProgress(step.progress);
+                    document.querySelector('.loading-text').textContent = step.message;
+                    await new Promise(resolve => setTimeout(resolve, 150));
                 }
-                console.log('Enhanced assets loaded');
+                
+                console.log('Enhanced assets with expanded Kenney collection loaded');
             }
             
             setupInput() {
@@ -1710,11 +2053,13 @@
             
             levelComplete() {
                 const nextLevel = this.gameState.currentLevel + 1;
+                const currentLevelName = this.level.currentLevel === 1 ? "Enchanted Garden Towers" : "Industrial Sky City";
                 
                 if (nextLevel <= 2) {
+                    const nextLevelName = nextLevel === 2 ? "Industrial Sky City" : "Unknown";
                     Utils.showMessage(
                         'Level Complete!',
-                        `Excellent work with the 3D navigation! Ready for level ${nextLevel}?`,
+                        `Excellent work navigating ${currentLevelName}! Ready to explore ${nextLevelName}?`,
                         'Next Level',
                         () => {
                             Utils.hideMessage();
@@ -1723,8 +2068,8 @@
                     );
                 } else {
                     Utils.showMessage(
-                        'Demo Complete!',
-                        `Congratulations! You've mastered the enhanced 3D platformer!\nFinal Score: ${this.gameState.score}\n\nThis demo showcases advanced camera controls and 3D level design.`,
+                        'Enhanced Demo Complete!',
+                        `Congratulations! You've mastered both levels of the enhanced 3D platformer!\n\n✨ Enchanted Garden Towers - Complete!\n🏭 Industrial Sky City - Complete!\n\nFinal Score: ${this.gameState.score}\n\nThis showcases advanced camera controls, rich 3D level design, and expanded Kenney asset integration!`,
                         'Play Again',
                         () => {
                             Utils.hideMessage();
