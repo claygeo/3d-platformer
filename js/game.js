@@ -1,483 +1,411 @@
 /**
- * Main Game class - handles scene setup, game loop, and state management
+ * Player class - handles player movement, physics, and interactions
  */
 
-class Game {
-    constructor() {
-        // Three.js core
-        this.scene = null;
+class Player {
+    constructor(scene) {
+        this.scene = scene;
+        this.mesh = null;
+        
+        // Physics properties
+        this.velocity = new THREE.Vector3(0, 0, 0);
+        this.position = new THREE.Vector3(0, 5, 0);
+        this.rotation = 0;
+        
+        // Movement properties
+        this.speed = 0.15;
+        this.jumpForce = 0.4;
+        this.gravity = -0.02;
+        
+        // State
+        this.isGrounded = false;
+        this.isJumping = false;
+        this.lives = 3;
+        this.isAlive = true;
+        
+        // Input state
+        this.keys = {
+            left: false,
+            right: false,
+            forward: false,
+            backward: false,
+            space: false,
+            shift: false
+        };
+        
+        // Camera reference (will be set by game)
         this.camera = null;
-        this.renderer = null;
         
-        // Loaders
-        this.loadingManager = null;
-        this.gltfLoader = null;
-        
-        // Game objects
-        this.player = null;
-        this.level = null;
-        
-        // Game state
-        this.gameState = {
-            isPlaying: false,
-            isPaused: false,
-            isLoading: true,
-            currentLevel: 1,
-            score: 0,
-            coins: 0,
-            lives: 3,
-            assetsLoaded: 0,
-            totalAssets: 0
-        };
-        
-        // Assets to preload
-        this.requiredAssets = [
-            // Platforms
-            'assets/models/platforms/block-grass.glb',
-            'assets/models/platforms/block-grass-large.glb',
-            'assets/models/platforms/block-grass-corner.glb',
-            'assets/models/platforms/block-grass-curve.glb',
-            'assets/models/platforms/platform.glb',
-            'assets/models/platforms/platform-ramp.glb',
-            
-            // Collectibles
-            'assets/models/collectibles/coin-gold.glb',
-            'assets/models/collectibles/coin-silver.glb',
-            'assets/models/collectibles/coin-bronze.glb',
-            'assets/models/collectibles/heart.glb',
-            'assets/models/collectibles/jewel.glb',
-            'assets/models/collectibles/key.glb',
-            
-            // Environment
-            'assets/models/environment/tree.glb',
-            'assets/models/environment/tree-pine.glb',
-            'assets/models/environment/rocks.glb',
-            'assets/models/environment/grass.glb',
-            'assets/models/environment/flowers.glb',
-            
-            // Interactive
-            'assets/models/interactive/crate.glb',
-            'assets/models/interactive/chest.glb',
-            'assets/models/interactive/button-round.glb',
-            'assets/models/interactive/door-rotate.glb',
-            'assets/models/interactive/lever.glb',
-            'assets/models/interactive/flag.glb',
-            
-            // Hazards
-            'assets/models/hazards/spike-block.glb',
-            'assets/models/hazards/saw.glb',
-            'assets/models/hazards/trap-spikes.glb',
-            'assets/models/hazards/bomb.glb',
-            
-            // Structures
-            'assets/models/structures/fence-low-straight.glb',
-            'assets/models/structures/ladder.glb',
-            'assets/models/structures/poles.glb'
-        ];
-        
-        // Animation frame ID
-        this.animationId = null;
+        this.init();
+        this.setupInput();
     }
     
-    async init() {
-        console.log('Initializing 3D Platformer...');
-        
-        try {
-            this.setupScene();
-            this.setupCamera();
-            this.setupRenderer();
-            this.setupLighting();
-            this.setupLoading();
-            
-            // Load assets
-            await this.loadAssets();
-            
-            // Initialize game objects
-            this.player = new Player(this.scene);
-            this.level = new Level(this.scene, this.gltfLoader);
-            
-            // Setup game
-            this.setupInput();
-            this.setupUI();
-            
-            // Load first level
-            await this.loadLevel(1);
-            
-            // Start game
-            this.startGame();
-            
-        } catch (error) {
-            console.error('Failed to initialize game:', error);
-            this.showError('Failed to load game. Please refresh and try again.');
-        }
-    }
-    
-    setupScene() {
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x87CEEB);
-        this.scene.fog = new THREE.Fog(0x87CEEB, 50, 200);
-    }
-    
-    setupCamera() {
-        this.camera = new THREE.PerspectiveCamera(
-            75, 
-            window.innerWidth / window.innerHeight, 
-            0.1, 
-            1000
-        );
-        this.camera.position.set(0, 10, 15);
-    }
-    
-    setupRenderer() {
-        this.renderer = new THREE.WebGLRenderer({ 
-            antialias: true,
-            powerPreference: "high-performance"
-        });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.setClearColor(0x87CEEB);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        
-        document.getElementById('gameContainer').appendChild(this.renderer.domElement);
-    }
-    
-    setupLighting() {
-        // Ambient light
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-        this.scene.add(ambientLight);
-        
-        // Directional light (sun)
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(50, 50, 50);
-        directionalLight.castShadow = true;
-        
-        // Shadow camera settings
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
-        directionalLight.shadow.camera.near = 0.5;
-        directionalLight.shadow.camera.far = 500;
-        directionalLight.shadow.camera.left = -50;
-        directionalLight.shadow.camera.right = 50;
-        directionalLight.shadow.camera.top = 50;
-        directionalLight.shadow.camera.bottom = -50;
-        
-        this.scene.add(directionalLight);
-        
-        // Additional fill light
-        const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.3);
-        fillLight.position.set(-30, 20, -30);
-        this.scene.add(fillLight);
-    }
-    
-    setupLoading() {
-        this.loadingManager = new THREE.LoadingManager();
-        this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
-        
-        this.gameState.totalAssets = this.requiredAssets.length;
-        
-        this.loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-            const progress = (itemsLoaded / itemsTotal) * 100;
-            Utils.updateLoadingProgress(progress);
-        };
-        
-        this.loadingManager.onLoad = () => {
-            console.log('All assets loaded');
-            this.gameState.isLoading = false;
-        };
-        
-        this.loadingManager.onError = (url) => {
-            console.warn(`Failed to load: ${url}`);
-        };
-    }
-    
-    async loadAssets() {
-        console.log(`Loading ${this.requiredAssets.length} assets...`);
-        
-        const loadPromises = this.requiredAssets.map(assetPath => {
-            return Utils.loadModel(assetPath, this.gltfLoader).catch(error => {
-                console.warn(`Asset load failed: ${assetPath}`, error);
-                return null; // Continue loading other assets
-            });
+    init() {
+        // Create player geometry (cylinder-like character for r128 compatibility)
+        const geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 8);
+        const material = new THREE.MeshLambertMaterial({ 
+            color: 0x4CAF50,
+            transparent: true,
+            opacity: 0.9
         });
         
-        await Promise.allSettled(loadPromises);
-        console.log('Asset loading complete');
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh.position.copy(this.position);
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
+        
+        // Add a simple face indicator
+        const faceGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+        const faceMaterial = new THREE.MeshBasicMaterial({ color: 0x2196F3 });
+        this.face = new THREE.Mesh(faceGeometry, faceMaterial);
+        this.face.position.set(0, 0.3, 0.4);
+        this.mesh.add(this.face);
+        
+        this.scene.add(this.mesh);
     }
     
     setupInput() {
-        // Game controls
+        // Keyboard event listeners
         document.addEventListener('keydown', (event) => {
-            switch(event.code) {
-                case 'KeyR':
-                    this.restartLevel();
-                    break;
-                case 'KeyN':
-                    this.nextLevel();
-                    break;
-                case 'KeyP':
-                case 'Escape':
-                    this.togglePause();
-                    break;
-                case 'KeyM':
-                    this.toggleMusic();
-                    break;
+            this.handleKeyDown(event);
+        });
+        
+        document.addEventListener('keyup', (event) => {
+            this.handleKeyUp(event);
+        });
+        
+        // Prevent default behavior for game keys
+        document.addEventListener('keydown', (event) => {
+            if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
+                event.preventDefault();
+            }
+        });
+    }
+    
+    handleKeyDown(event) {
+        switch(event.code) {
+            case 'KeyW':
+            case 'ArrowUp':
+                this.keys.forward = true;
+                break;
+            case 'KeyS':
+            case 'ArrowDown':
+                this.keys.backward = true;
+                break;
+            case 'KeyA':
+            case 'ArrowLeft':
+                this.keys.left = true;
+                break;
+            case 'KeyD':
+            case 'ArrowRight':
+                this.keys.right = true;
+                break;
+            case 'Space':
+                this.keys.space = true;
+                break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+                this.keys.shift = true;
+                break;
+        }
+    }
+    
+    handleKeyUp(event) {
+        switch(event.code) {
+            case 'KeyW':
+            case 'ArrowUp':
+                this.keys.forward = false;
+                break;
+            case 'KeyS':
+            case 'ArrowDown':
+                this.keys.backward = false;
+                break;
+            case 'KeyA':
+            case 'ArrowLeft':
+                this.keys.left = false;
+                break;
+            case 'KeyD':
+            case 'ArrowRight':
+                this.keys.right = false;
+                break;
+            case 'Space':
+                this.keys.space = false;
+                break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+                this.keys.shift = false;
+                break;
+        }
+    }
+    
+    update(platforms = [], collectibles = [], hazards = []) {
+        if (!this.isAlive) return;
+        
+        this.updateMovement();
+        this.updatePhysics();
+        this.checkPlatformCollisions(platforms);
+        this.checkCollectibleCollisions(collectibles);
+        this.checkHazardCollisions(hazards);
+        this.checkBoundaries();
+        this.updateMesh();
+    }
+    
+    updateMovement() {
+        const currentSpeed = this.keys.shift ? this.speed * 1.5 : this.speed;
+        
+        // Horizontal movement
+        if (this.keys.left) {
+            this.velocity.x = -currentSpeed;
+        } else if (this.keys.right) {
+            this.velocity.x = currentSpeed;
+        } else {
+            this.velocity.x *= 0.8; // Friction
+        }
+        
+        // Forward/backward movement
+        if (this.keys.forward) {
+            this.velocity.z = -currentSpeed;
+        } else if (this.keys.backward) {
+            this.velocity.z = currentSpeed;
+        } else {
+            this.velocity.z *= 0.8; // Friction
+        }
+        
+        // Jumping
+        if (this.keys.space && this.isGrounded && !this.isJumping) {
+            this.velocity.y = this.jumpForce;
+            this.isGrounded = false;
+            this.isJumping = true;
+        }
+        
+        // Limit horizontal speed
+        const maxSpeed = currentSpeed * 1.2;
+        this.velocity.x = Utils.clamp(this.velocity.x, -maxSpeed, maxSpeed);
+        this.velocity.z = Utils.clamp(this.velocity.z, -maxSpeed, maxSpeed);
+    }
+    
+    updatePhysics() {
+        // Apply gravity
+        if (!this.isGrounded) {
+            this.velocity.y += this.gravity;
+        }
+        
+        // Update position
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        this.position.z += this.velocity.z;
+        
+        // Ground collision (basic floor)
+        if (this.position.y <= 1) {
+            this.position.y = 1;
+            this.velocity.y = 0;
+            this.isGrounded = true;
+            this.isJumping = false;
+        }
+    }
+    
+    checkPlatformCollisions(platforms) {
+        let onPlatform = false;
+        
+        platforms.forEach(platform => {
+            if (Utils.isOnPlatform(this, platform)) {
+                // Check if player is falling onto the platform
+                if (this.velocity.y <= 0) {
+                    this.position.y = platform.position.y + 2;
+                    this.velocity.y = 0;
+                    this.isGrounded = true;
+                    this.isJumping = false;
+                    onPlatform = true;
+                }
             }
         });
         
-        // Window resize
-        window.addEventListener('resize', () => {
-            this.onWindowResize();
-        });
-        
-        // Prevent context menu
-        document.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
+        // If not on any platform and above ground, player is in air
+        if (!onPlatform && this.position.y > 1.1) {
+            this.isGrounded = false;
+        }
+    }
+    
+    checkCollectibleCollisions(collectibles) {
+        collectibles.forEach(collectible => {
+            if (!collectible.userData.collected && Utils.isColliding(this, collectible, 1.5)) {
+                this.collectItem(collectible);
+            }
         });
     }
     
-    setupUI() {
-        this.updateUI();
-        Utils.showGameUI();
+    checkHazardCollisions(hazards) {
+        hazards.forEach(hazard => {
+            if (Utils.isColliding(this, hazard, 1.5)) {
+                this.takeDamage();
+            }
+        });
     }
     
-    async loadLevel(levelNumber) {
-        console.log(`Loading level ${levelNumber}...`);
+    collectItem(collectible) {
+        collectible.userData.collected = true;
+        collectible.visible = false;
         
-        try {
-            const success = await this.level.loadLevel(levelNumber);
+        // Create particle effect
+        Utils.createParticleEffect(this.scene, collectible.position.clone(), 0xFFD700);
+        
+        // Update game state based on item type
+        const type = collectible.userData.type || 'coin';
+        
+        switch(type) {
+            case 'coin-gold':
+                game.addScore(100);
+                game.addCoin();
+                break;
+            case 'coin-silver':
+                game.addScore(50);
+                game.addCoin();
+                break;
+            case 'coin-bronze':
+                game.addScore(25);
+                game.addCoin();
+                break;
+            case 'heart':
+                this.addLife();
+                game.addScore(200);
+                break;
+            case 'jewel':
+                game.addScore(500);
+                break;
+            case 'key':
+                game.addScore(300);
+                // Key collection could unlock doors in future
+                break;
+            default:
+                game.addScore(50);
+                game.addCoin();
+                break;
+        }
+    }
+    
+    takeDamage() {
+        if (!this.isAlive) return;
+        
+        this.lives--;
+        Utils.updateUI('lives', this.lives);
+        
+        // Create damage effect
+        Utils.createParticleEffect(this.scene, this.position.clone(), 0xFF0000);
+        
+        // Knockback effect
+        this.velocity.y = 0.2;
+        this.velocity.x *= -2;
+        this.velocity.z *= -2;
+        
+        if (this.lives <= 0) {
+            this.die();
+        } else {
+            // Temporary invincibility and visual feedback
+            this.mesh.material.color.setHex(0xFF0000);
+            setTimeout(() => {
+                this.mesh.material.color.setHex(0x4CAF50);
+            }, 500);
+        }
+    }
+    
+    addLife() {
+        this.lives++;
+        Utils.updateUI('lives', this.lives);
+    }
+    
+    die() {
+        this.isAlive = false;
+        this.mesh.material.color.setHex(0x666666);
+        this.mesh.material.opacity = 0.5;
+        
+        // Game over handling
+        setTimeout(() => {
+            game.playerDied();
+        }, 1000);
+    }
+    
+    checkBoundaries() {
+        // Fall off the world
+        if (this.position.y < -20) {
+            this.takeDamage();
+            this.respawn();
+        }
+        
+        // Optional: limit world boundaries
+        const maxDistance = 100;
+        this.position.x = Utils.clamp(this.position.x, -maxDistance, maxDistance);
+        this.position.z = Utils.clamp(this.position.z, -maxDistance, maxDistance);
+    }
+    
+    respawn() {
+        // Reset to spawn position
+        this.position.set(0, 5, 0);
+        this.velocity.set(0, 0, 0);
+        this.isGrounded = false;
+        this.isJumping = false;
+    }
+    
+    updateMesh() {
+        if (this.mesh) {
+            this.mesh.position.copy(this.position);
             
-            if (success) {
-                this.gameState.currentLevel = levelNumber;
-                
-                // Reset player
-                const spawnPos = this.level.getPlayerSpawnPosition();
-                this.player.reset(spawnPos);
-                
-                // Reset game state for new level
-                this.gameState.coins = 0;
-                
-                this.updateUI();
-                
-                console.log(`Level ${levelNumber} loaded successfully`);
-                return true;
-            } else {
-                throw new Error(`Failed to load level ${levelNumber}`);
+            // Rotate player based on movement direction
+            if (Math.abs(this.velocity.x) > 0.01 || Math.abs(this.velocity.z) > 0.01) {
+                const angle = Math.atan2(this.velocity.x, this.velocity.z);
+                this.mesh.rotation.y = Utils.lerp(this.mesh.rotation.y, angle, 0.1);
             }
             
-        } catch (error) {
-            console.error(`Error loading level ${levelNumber}:`, error);
-            this.showError(`Failed to load level ${levelNumber}`);
-            return false;
+            // Slight bobbing animation when moving
+            if (this.isGrounded && (Math.abs(this.velocity.x) > 0.01 || Math.abs(this.velocity.z) > 0.01)) {
+                this.mesh.position.y += Math.sin(Date.now() * 0.01) * 0.05;
+            }
         }
     }
     
-    startGame() {
-        this.gameState.isPlaying = true;
-        this.gameState.isPaused = false;
+    updateCamera(camera) {
+        if (!camera) return;
         
-        // Start game loop
-        this.animate();
-        
-        console.log('Game started!');
-    }
-    
-    animate() {
-        if (!this.gameState.isPlaying) return;
-        
-        this.animationId = requestAnimationFrame(() => this.animate());
-        
-        if (!this.gameState.isPaused) {
-            this.update();
-            this.render();
-        }
-    }
-    
-    update() {
-        if (!this.player || !this.level) return;
-        
-        // Update player
-        this.player.update(
-            this.level.getPlatforms(),
-            this.level.getCollectibles(),
-            this.level.getHazards()
+        // Smooth camera follow
+        const idealCameraPosition = new THREE.Vector3(
+            this.position.x,
+            this.position.y + 8,
+            this.position.z + 12
         );
         
-        // Update camera
-        this.player.updateCamera(this.camera);
+        camera.position.lerp(idealCameraPosition, 0.05);
         
-        // Update level
-        this.level.update();
-        
-        // Check level completion
-        if (this.level.checkLevelComplete()) {
-            this.levelComplete();
-        }
-        
-        // Update UI
-        this.updateUI();
-    }
-    
-    render() {
-        this.renderer.render(this.scene, this.camera);
-    }
-    
-    levelComplete() {
-        const nextLevel = this.gameState.currentLevel + 1;
-        
-        // Check if there's a next level
-        if (nextLevel <= 3) {
-            Utils.showMessage(
-                'Level Complete!',
-                `Great job! Ready for level ${nextLevel}?`,
-                'Next Level',
-                () => {
-                    Utils.hideMessage();
-                    this.loadLevel(nextLevel);
-                }
-            );
-        } else {
-            // Game complete
-            Utils.showMessage(
-                'Game Complete!',
-                `Congratulations! You've completed all levels!\\nFinal Score: ${this.gameState.score}`,
-                'Play Again',
-                () => {
-                    Utils.hideMessage();
-                    this.loadLevel(1);
-                    this.gameState.score = 0;
-                }
-            );
-        }
-    }
-    
-    playerDied() {
-        if (this.gameState.lives <= 0) {
-            // Game over
-            Utils.showMessage(
-                'Game Over',
-                `Better luck next time!\\nFinal Score: ${this.gameState.score}`,
-                'Restart',
-                () => {
-                    Utils.hideMessage();
-                    this.restartGame();
-                }
-            );
-        } else {
-            // Respawn player
-            this.restartLevel();
-        }
-    }
-    
-    restartLevel() {
-        console.log('Restarting level...');
-        
-        // Reset player
-        const spawnPos = this.level.getPlayerSpawnPosition();
-        this.player.reset(spawnPos);
-        this.player.lives = this.gameState.lives;
-        
-        // Reset level collectibles
-        this.level.resetCollectibles();
-        
-        // Reset coins count
-        this.gameState.coins = 0;
-        
-        this.updateUI();
-    }
-    
-    restartGame() {
-        // Reset game state
-        this.gameState.score = 0;
-        this.gameState.coins = 0;
-        this.gameState.lives = 3;
-        this.gameState.currentLevel = 1;
-        
-        // Reset player
-        this.player.lives = 3;
-        this.player.isAlive = true;
-        
-        // Load first level
-        this.loadLevel(1);
-    }
-    
-    nextLevel() {
-        const nextLevel = this.gameState.currentLevel + 1;
-        if (nextLevel <= 3) {
-            this.loadLevel(nextLevel);
-        }
-    }
-    
-    togglePause() {
-        this.gameState.isPaused = !this.gameState.isPaused;
-        Utils.togglePauseMenu(this.gameState.isPaused);
-        
-        if (this.gameState.isPaused) {
-            console.log('Game paused');
-        } else {
-            console.log('Game resumed');
-        }
-    }
-    
-    resumeGame() {
-        this.gameState.isPaused = false;
-        Utils.togglePauseMenu(false);
-    }
-    
-    addScore(points) {
-        this.gameState.score += points;
-    }
-    
-    addCoin() {
-        this.gameState.coins++;
-    }
-    
-    updateUI() {
-        Utils.updateUI('score', this.gameState.score);
-        Utils.updateUI('lives', this.player ? this.player.lives : this.gameState.lives);
-        Utils.updateUI('coins', this.gameState.coins);
-        Utils.updateUI('currentLevel', this.gameState.currentLevel);
-    }
-    
-    onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-    
-    showError(message) {
-        Utils.showMessage(
-            'Error',
-            message,
-            'OK',
-            () => Utils.hideMessage()
+        // Look slightly ahead of the player
+        const lookAtPosition = new THREE.Vector3(
+            this.position.x + this.velocity.x * 2,
+            this.position.y + 1,
+            this.position.z + this.velocity.z * 2
         );
-    }
-    
-    hideMessage() {
-        Utils.hideMessage();
-    }
-    
-    toggleMusic() {
-        // Placeholder for music toggle
-        console.log('Music toggle (not implemented - no audio files)');
-    }
-    
-    // Cleanup
-    destroy() {
-        if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-        }
         
-        if (this.renderer) {
-            this.renderer.dispose();
-        }
+        camera.lookAt(lookAtPosition);
+    }
+    
+    // Reset player for new level
+    reset(spawnPosition = new THREE.Vector3(0, 5, 0)) {
+        this.position.copy(spawnPosition);
+        this.velocity.set(0, 0, 0);
+        this.isGrounded = false;
+        this.isJumping = false;
+        this.isAlive = true;
         
-        // Remove event listeners
-        document.removeEventListener('keydown', this.handleKeyDown);
-        window.removeEventListener('resize', this.onWindowResize);
+        if (this.mesh) {
+            this.mesh.material.color.setHex(0x4CAF50);
+            this.mesh.material.opacity = 0.9;
+            this.mesh.position.copy(this.position);
+        }
+    }
+    
+    // Get player status for game state
+    getStatus() {
+        return {
+            position: this.position.clone(),
+            lives: this.lives,
+            isAlive: this.isAlive,
+            isGrounded: this.isGrounded
+        };
     }
 }
-
-// Create global game instance
-const game = new Game();
