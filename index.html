@@ -808,7 +808,7 @@
                 this.distance = 15;
                 this.minDistance = 5;
                 this.maxDistance = 50;
-                this.azimuth = 0; // Horizontal rotation
+                this.azimuth = Math.PI; // Start facing opposite direction (180 degrees)
                 this.elevation = 0.3; // Vertical rotation
                 this.minElevation = -Math.PI / 3;
                 this.maxElevation = Math.PI / 3;
@@ -895,8 +895,8 @@
             }
             
             focusPlayer() {
-                // Smoothly move camera to focus on player
-                this.azimuth = 0;
+                // Smoothly move camera to focus on player with corrected orientation
+                this.azimuth = Math.PI; // Face opposite direction
                 this.elevation = 0.3;
                 this.distance = 15;
             }
@@ -1018,10 +1018,11 @@
             
             handleKeyDown(event) {
                 switch(event.code) {
-                    case 'KeyW': case 'ArrowUp': this.keys.forward = true; break;
-                    case 'KeyS': case 'ArrowDown': this.keys.backward = true; break;
-                    case 'KeyA': case 'ArrowLeft': this.keys.left = true; break;
-                    case 'KeyD': case 'ArrowRight': this.keys.right = true; break;
+                    // Try swapping the key assignments to fix movement
+                    case 'KeyW': case 'ArrowUp': this.keys.forward = true; break;    // W = forward
+                    case 'KeyS': case 'ArrowDown': this.keys.backward = true; break; // S = backward
+                    case 'KeyA': case 'ArrowLeft': this.keys.left = true; break;     // A = left
+                    case 'KeyD': case 'ArrowRight': this.keys.right = true; break;   // D = right
                     case 'Space': this.keys.space = true; event.preventDefault(); break;
                     case 'ShiftLeft': case 'ShiftRight': this.keys.shift = true; break;
                 }
@@ -1053,19 +1054,19 @@
             updateMovement() {
                 const currentSpeed = this.keys.shift ? this.speed * 1.5 : this.speed;
                 
-                // Fixed movement: W/S for forward/backward (Z-axis), A/D for left/right (X-axis)
+                // Try completely inverted directions:
                 if (this.keys.forward) {
-                    this.velocity.z = -currentSpeed;
+                    this.velocity.z = currentSpeed;  // W -> positive Z (backward in world coords)
                 } else if (this.keys.backward) {
-                    this.velocity.z = currentSpeed;
+                    this.velocity.z = -currentSpeed; // S -> negative Z (forward in world coords)
                 } else {
                     this.velocity.z *= 0.8;
                 }
                 
                 if (this.keys.left) {
-                    this.velocity.x = -currentSpeed;
+                    this.velocity.x = currentSpeed;  // A -> positive X (right in world coords)
                 } else if (this.keys.right) {
-                    this.velocity.x = currentSpeed;
+                    this.velocity.x = -currentSpeed; // D -> negative X (left in world coords)
                 } else {
                     this.velocity.x *= 0.8;
                 }
