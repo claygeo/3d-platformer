@@ -3,664 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced 3D Platformer</title>
+    <title>Enhanced 3D Exploration Game</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow: hidden;
-            user-select: none;
-        }
-
-        #gameContainer {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        canvas {
-            display: block;
-            cursor: grab;
-        }
-
-        canvas:active {
-            cursor: grabbing;
-        }
-
-        /* Loading Screen */
-        #loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .loading-content {
-            text-align: center;
-            color: white;
-        }
-
-        .loading-content h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .loading-bar {
-            width: 300px;
-            height: 20px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-
-        .loading-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        /* Game UI */
-        #gameUI {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        #topUI {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 15px 20px;
-            border-radius: 10px;
-            color: white;
-            backdrop-filter: blur(10px);
-            pointer-events: auto;
-        }
-
-        .ui-panel {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .stat {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .label {
-            font-weight: bold;
-            color: #FFD700;
-        }
-
-        #instructions {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            backdrop-filter: blur(10px);
-            pointer-events: auto;
-        }
-
-        .control-group h3 {
-            margin-bottom: 10px;
-            color: #4CAF50;
-        }
-
-        .control {
-            margin: 5px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .key {
-            background: #333;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-weight: bold;
-        }
-
-        /* Camera Controls Info */
-        #cameraInfo {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            backdrop-filter: blur(10px);
-            pointer-events: auto;
-        }
-
-        /* Game Messages */
-        #gameMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            pointer-events: auto;
-            z-index: 200;
-        }
-
-        #gameMessage.hidden {
-            display: none;
-        }
-
-        #gameMessage h2 {
-            margin-bottom: 15px;
-            color: #4CAF50;
-        }
-
-        #gameMessage button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-
-        #gameMessage button:hover {
-            background: #45a049;
-        }
-
-        /* Pause Menu */
-        #pauseMenu {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            pointer-events: auto;
-            z-index: 200;
-        }
-
-        #pauseMenu.hidden {
-            display: none;
-        }
-
-        #pauseMenu h2 {
-            margin-bottom: 20px;
-            color: #4CAF50;
-        }
-
-        #pauseMenu button {
-            display: block;
-            width: 100%;
-            background: #333;
-            color: white;
-            border: none;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-
-        #pauseMenu button:hover {
-            background: #4CAF50;
-        }
-
-        .fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Camera Mode Indicator */
-        #cameraMode {
-            position: absolute;
-            bottom: 80px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 15px;
-            border-radius: 8px;
-            color: white;
-            backdrop-filter: blur(10px);
-            pointer-events: auto;
-        }
-
-        .mode-active {
-            color: #4CAF50;
-            font-weight: bold;
-        }
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        canvas { display: block; }
+        #gameUI { position: absolute; top: 10px; left: 10px; color: white; text-shadow: 1px 1px 2px black; }
+        #gameUI div { margin-bottom: 5px; font-size: 18px; }
+        #controls, #cameraControls { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; color: white; }
+        #cameraMode { position: absolute; bottom: 10px; left: 10px; color: white; }
+        #loading { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        #loadingBar { width: 300px; height: 20px; background: #333; border-radius: 10px; overflow: hidden; }
+        #loadingFill { height: 100%; background: #4CAF50; width: 0; transition: width 0.3s; }
+        #gameMessage, #pauseMenu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; }
+        #gameMessage.hidden, #pauseMenu.hidden { display: none; }
+        button { padding: 10px 20px; margin: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .fade-in { animation: fadeIn 1s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <!-- Loading Screen -->
-        <div id="loading">
-            <div class="loading-content">
-                <h1>Enhanced 3D Platformer</h1>
-                <div class="loading-text">Loading Enhanced Assets...</div>
-                <div class="loading-bar">
-                    <div class="loading-fill" id="loadingFill"></div>
-                </div>
-                <div id="loadingPercent">0%</div>
-            </div>
-        </div>
-
-        <!-- Main Game UI -->
-        <div id="gameUI" style="display: none;">
-            <div id="topUI">
-                <div class="ui-panel">
-                    <div class="stat">
-                        <span class="label">Score:</span>
-                        <span id="score">0</span>
-                    </div>
-                    <div class="stat">
-                        <span class="label">Lives:</span>
-                        <span id="lives">3</span>
-                    </div>
-                    <div class="stat">
-                        <span class="label">Coins:</span>
-                        <span id="coins">0</span>/<span id="totalCoins">0</span>
-                    </div>
-                    <div class="stat">
-                        <span class="label">Level:</span>
-                        <span id="currentLevel">1</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="cameraInfo">
-                <div class="control-group">
-                    <h3>Enhanced Camera</h3>
-                    <div class="control"><span class="key">Mouse Drag</span> Orbit Camera</div>
-                    <div class="control"><span class="key">Scroll Wheel</span> Zoom</div>
-                    <div class="control"><span class="key">C</span> Toggle Camera Mode</div>
-                    <div class="control"><span class="key">F</span> Focus Player</div>
-                </div>
-            </div>
-
-            <div id="instructions">
-                <div class="control-group">
-                    <h3>Controls</h3>
-                    <div class="control"><span class="key">WASD</span> Move</div>
-                    <div class="control"><span class="key">Space</span> Jump</div>
-                    <div class="control"><span class="key">Shift</span> Run</div>
-                    <div class="control"><span class="key">R</span> Restart Level</div>
-                    <div class="control"><span class="key">N</span> Next Level</div>
-                    <div class="control"><span class="key">ESC</span> Pause</div>
-                </div>
-            </div>
-
-            <div id="cameraMode">
-                Camera Mode: <span id="cameraModeText" class="mode-active">Free Orbit</span>
-            </div>
-
-            <!-- Game Messages -->
-            <div id="gameMessage" class="hidden">
-                <div class="message-content">
-                    <h2 id="messageTitle">Level Complete!</h2>
-                    <p id="messageText">Great job! Moving to next level...</p>
-                    <button id="messageButton" onclick="game.hideMessage()">Continue</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pause Menu -->
-        <div id="pauseMenu" class="hidden">
-            <div class="menu-content">
-                <h2>Game Paused</h2>
-                <button onclick="game.resumeGame()">Resume</button>
-                <button onclick="game.restartLevel()">Restart Level</button>
-                <button onclick="game.loadLevel(1)">Back to Level 1</button>
-            </div>
-        </div>
+    <div id="loading">
+        <h1>Enhanced 3D Exploration Game</h1>
+        <p>Loading Enhanced Assets...</p>
+        <div id="loadingBar"><div id="loadingFill"></div></div>
+        <span id="loadingPercent">0%</span>
     </div>
 
-    <!-- Three.js Core from unpkg (most reliable) -->
-    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <!-- GLTFLoader from unpkg (matches version) -->
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <div id="gameUI" style="display: none;">
+        <div>Score: <span id="score">0</span></div>
+        <div>Lives: <span id="lives">3</span></div>
+        <div>Coins: <span id="coins">0</span>/<span id="totalCoins">0</span></div>
+        <div>Keys: <span id="keys">0</span></div>
+        <div>Level: <span id="currentLevel">1</span></div>
+    </div>
 
+    <div id="cameraControls" class="hidden">
+        <h3>Enhanced Camera</h3>
+        <p>Mouse Drag: Orbit Camera</p>
+        <p>Scroll Wheel: Zoom</p>
+        <p>C: Toggle Camera Mode</p>
+        <p>F: Focus Player</p>
+    </div>
+
+    <div id="controls">
+        <h3>Controls</h3>
+        <p>WASD: Move</p>
+        <p>Space: Jump</p>
+        <p>Shift: Sprint</p>
+        <p>E: Interact</p>
+        <p>L: Climb Ladder</p>
+        <p>R: Restart Level</p>
+        <p>ESC: Pause</p>
+    </div>
+
+    <div id="cameraMode">Camera Mode: Free Orbit</div>
+
+    <div id="gameMessage" class="hidden">
+        <h1 id="messageTitle">Level Complete!</h1>
+        <p id="messageText">Great job! Moving to next level...</p>
+        <button id="messageButton">Continue</button>
+    </div>
+
+    <div id="pauseMenu" class="hidden">
+        <h1>Game Paused</h1>
+        <button onclick="game.resumeGame()">Resume</button>
+        <button onclick="game.restartLevel()">Restart Level</button>
+        <button onclick="game.restartGame()">Back to Level 1</button>
+    </div>
+
+    <div id="gameContainer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
-        // Enhanced Utility Functions
+        // Utils Class
         const Utils = {
             loadedModels: {},
-            
             loadModel(path, loader) {
                 return new Promise((resolve, reject) => {
-                    // If no loader available or for demo purposes, create fallback
-                    const fallback = this.createFallbackFromPath(path);
-                    this.loadedModels[path] = fallback;
-                    resolve(fallback);
+                    loader.load(
+                        path,
+                        (gltf) => {
+                            const model = gltf.scene;
+                            model.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+                                }
+                            });
+                            this.loadedModels[path] = model;
+                            resolve(model);
+                        },
+                        undefined,
+                        (error) => {
+                            console.warn(`Failed to load model: ${path}`, error);
+                            reject(error);
+                        }
+                    );
                 });
             },
-
-            createFallbackFromPath(path) {
-                if (!path) return this.createBasicCube();
-                
-                const filename = path.split('/').pop().replace('.glb', '');
-                let geometry, material, mesh;
-
-                // Platform types
-                if (filename.includes('grass')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
-                } else if (filename.includes('stone')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x616161 });
-                } else if (filename.includes('wood')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('metal')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x78909C });
-                } else if (filename.includes('snow')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
-                } else if (filename.includes('platform')) {
-                    geometry = new THREE.BoxGeometry(2, 0.5, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x9E9E9E });
-                } else if (filename.includes('bridge')) {
-                    geometry = new THREE.BoxGeometry(3, 0.2, 1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
+            cloneModel(path) {
+                if (!this.loadedModels[path]) {
+                    console.warn(`Model not loaded: ${path}`);
+                    return null;
                 }
-                // Collectibles
-                else if (filename.includes('coin')) {
-                    geometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 12);
-                    material = new THREE.MeshLambertMaterial({ 
-                        color: filename.includes('gold') ? 0xFFD700 : 
-                               filename.includes('silver') ? 0xC0C0C0 : 0xCD7F32 
-                    });
-                } else if (filename.includes('heart')) {
-                    geometry = new THREE.SphereGeometry(0.3, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFF69B4 });
-                } else if (filename.includes('jewel')) {
-                    geometry = new THREE.OctahedronGeometry(0.4);
-                    material = new THREE.MeshLambertMaterial({ color: 0x9C27B0 });
-                } else if (filename.includes('gem-blue')) {
-                    geometry = new THREE.OctahedronGeometry(0.3);
-                    material = new THREE.MeshLambertMaterial({ color: 0x2196F3 });
-                } else if (filename.includes('gem-red')) {
-                    geometry = new THREE.OctahedronGeometry(0.3);
-                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
-                } else if (filename.includes('gem-green')) {
-                    geometry = new THREE.OctahedronGeometry(0.3);
-                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
-                } else if (filename.includes('star')) {
-                    geometry = new THREE.SphereGeometry(0.4, 5, 5);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFFEB3B });
-                } else if (filename.includes('key')) {
-                    geometry = new THREE.BoxGeometry(0.2, 0.6, 0.1);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFFC107 });
-                }
-                // Environment - Trees
-                else if (filename.includes('tree-pine')) {
-                    geometry = new THREE.ConeGeometry(1, 4, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x1B5E20 });
-                } else if (filename.includes('tree-oak')) {
-                    geometry = new THREE.CylinderGeometry(1.2, 0.3, 4, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x2E7D32 });
-                } else if (filename.includes('tree-palm')) {
-                    geometry = new THREE.CylinderGeometry(0.2, 0.3, 5, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
-                } else if (filename.includes('tree')) {
-                    geometry = new THREE.CylinderGeometry(0.3, 0.5, 3, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x2E7D32 });
-                }
-                // Environment - Rocks
-                else if (filename.includes('rock-large')) {
-                    geometry = new THREE.SphereGeometry(1.2, 6, 6);
-                    material = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
-                } else if (filename.includes('rock-small')) {
-                    geometry = new THREE.SphereGeometry(0.4, 6, 6);
-                    material = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
-                } else if (filename.includes('rocks')) {
-                    geometry = new THREE.SphereGeometry(0.8, 6, 6);
-                    material = new THREE.MeshLambertMaterial({ color: 0x5D4037 });
-                }
-                // Environment - Flora
-                else if (filename.includes('flower-red')) {
-                    geometry = new THREE.SphereGeometry(0.15, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
-                } else if (filename.includes('flower-blue')) {
-                    geometry = new THREE.SphereGeometry(0.15, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x2196F3 });
-                } else if (filename.includes('flowers')) {
-                    geometry = new THREE.SphereGeometry(0.2, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xE91E63 });
-                } else if (filename.includes('bush')) {
-                    geometry = new THREE.SphereGeometry(0.6, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x388E3C });
-                } else if (filename.includes('mushroom-red')) {
-                    geometry = new THREE.CylinderGeometry(0.4, 0.1, 0.6, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
-                } else if (filename.includes('mushroom')) {
-                    geometry = new THREE.CylinderGeometry(0.3, 0.1, 0.4, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('grass')) {
-                    geometry = new THREE.PlaneGeometry(0.5, 0.5);
-                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
-                } else if (filename.includes('crystal')) {
-                    geometry = new THREE.OctahedronGeometry(0.8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x00BCD4 });
-                } else if (filename.includes('stone-pillar')) {
-                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x616161 });
-                } else if (filename.includes('log')) {
-                    geometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 8);
-                    geometry.rotateZ(Math.PI / 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                }
-                // Interactive
-                else if (filename.includes('crate-metal')) {
-                    geometry = new THREE.BoxGeometry(1, 1, 1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x607D8B });
-                } else if (filename.includes('crate')) {
-                    geometry = new THREE.BoxGeometry(1, 1, 1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('barrel')) {
-                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 12);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('chest-large')) {
-                    geometry = new THREE.BoxGeometry(1.5, 1, 1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x6D4C41 });
-                } else if (filename.includes('chest')) {
-                    geometry = new THREE.BoxGeometry(1, 0.8, 0.6);
-                    material = new THREE.MeshLambertMaterial({ color: 0x6D4C41 });
-                } else if (filename.includes('button')) {
-                    geometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
-                } else if (filename.includes('lever')) {
-                    geometry = new THREE.BoxGeometry(0.2, 1, 0.2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x795548 });
-                } else if (filename.includes('gate')) {
-                    geometry = new THREE.BoxGeometry(3, 2, 0.2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('flag-banner')) {
-                    const group = new THREE.Group();
-                    const pole = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.05, 0.05, 3),
-                        new THREE.MeshLambertMaterial({ color: 0x8D6E63 })
-                    );
-                    const banner = new THREE.Mesh(
-                        new THREE.PlaneGeometry(1.5, 0.8),
-                        new THREE.MeshLambertMaterial({ color: 0x673AB7 })
-                    );
-                    banner.position.set(0.75, 1.5, 0);
-                    group.add(pole);
-                    group.add(banner);
-                    group.castShadow = true;
-                    group.receiveShadow = true;
-                    return group;
-                } else if (filename.includes('flag')) {
-                    const group = new THREE.Group();
-                    const pole = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.05, 0.05, 3),
-                        new THREE.MeshLambertMaterial({ color: 0x8D6E63 })
-                    );
-                    const flag = new THREE.Mesh(
-                        new THREE.PlaneGeometry(1, 0.6),
-                        new THREE.MeshLambertMaterial({ color: 0xFF4444 })
-                    );
-                    flag.position.set(0.5, 1, 0);
-                    group.add(pole);
-                    group.add(flag);
-                    group.castShadow = true;
-                    group.receiveShadow = true;
-                    return group;
-                } else if (filename.includes('sign')) {
-                    geometry = new THREE.BoxGeometry(1, 0.6, 0.1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('torch')) {
-                    geometry = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('lantern')) {
-                    geometry = new THREE.SphereGeometry(0.3, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFFEB3B });
-                }
-                // Hazards
-                else if (filename.includes('spike-ball')) {
-                    geometry = new THREE.SphereGeometry(0.5, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
-                } else if (filename.includes('spike')) {
-                    geometry = new THREE.ConeGeometry(0.5, 1, 4);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
-                } else if (filename.includes('saw-blade')) {
-                    geometry = new THREE.CylinderGeometry(1, 1, 0.1, 16);
-                    material = new THREE.MeshLambertMaterial({ color: 0x607D8B });
-                } else if (filename.includes('saw')) {
-                    geometry = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 12);
-                    material = new THREE.MeshLambertMaterial({ color: 0xF44336 });
-                } else if (filename.includes('bomb')) {
-                    geometry = new THREE.SphereGeometry(0.4, 8, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x212121 });
-                } else if (filename.includes('lava')) {
-                    geometry = new THREE.PlaneGeometry(2, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFF5722 });
-                } else if (filename.includes('fire')) {
-                    geometry = new THREE.ConeGeometry(0.3, 1, 6);
-                    material = new THREE.MeshLambertMaterial({ color: 0xFF9800 });
-                } else if (filename.includes('crusher')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 2);
-                    material = new THREE.MeshLambertMaterial({ color: 0x424242 });
-                }
-                // Structures  
-                else if (filename.includes('fence')) {
-                    geometry = new THREE.BoxGeometry(2, 1, 0.1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('ladder')) {
-                    geometry = new THREE.BoxGeometry(0.8, 2, 0.1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('column') || filename.includes('pillar')) {
-                    geometry = new THREE.CylinderGeometry(0.4, 0.4, 4, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x9E9E9E });
-                } else if (filename.includes('wall')) {
-                    geometry = new THREE.BoxGeometry(2, 3, 0.5);
-                    material = new THREE.MeshLambertMaterial({ color: 0x795548 });
-                } else if (filename.includes('poles')) {
-                    geometry = new THREE.CylinderGeometry(0.1, 0.1, 2, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                }
-                // Decorations
-                else if (filename.includes('banner')) {
-                    geometry = new THREE.PlaneGeometry(1, 1.5);
-                    material = new THREE.MeshLambertMaterial({ color: 0x673AB7 });
-                } else if (filename.includes('statue')) {
-                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x9E9E9E });
-                } else if (filename.includes('fountain')) {
-                    geometry = new THREE.CylinderGeometry(1, 1, 0.5, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x81C784 });
-                } else if (filename.includes('campfire')) {
-                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('tent')) {
-                    geometry = new THREE.ConeGeometry(1, 1.5, 4);
-                    material = new THREE.MeshLambertMaterial({ color: 0x4CAF50 });
-                } else if (filename.includes('windmill')) {
-                    geometry = new THREE.CylinderGeometry(0.5, 0.7, 3, 8);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                } else if (filename.includes('well')) {
-                    geometry = new THREE.CylinderGeometry(0.8, 0.8, 1, 12);
-                    material = new THREE.MeshLambertMaterial({ color: 0x795548 });
-                } else if (filename.includes('cart')) {
-                    geometry = new THREE.BoxGeometry(1.5, 0.5, 1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x8D6E63 });
-                }
-                // Default
-                else {
-                    geometry = new THREE.BoxGeometry(1, 1, 1);
-                    material = new THREE.MeshLambertMaterial({ color: 0x808080 });
-                }
-
-                mesh = new THREE.Mesh(geometry, material);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                return mesh;
+                return this.loadedModels[path].clone();
             },
-
-            createBasicCube() {
-                const geometry = new THREE.BoxGeometry(1, 1, 1);
-                const material = new THREE.MeshLambertMaterial({ color: 0x808080 });
+            createFallbackGeometry(type = 'box', color = 0x4CAF50, size = [1, 1, 1]) {
+                let geometry;
+                switch(type) {
+                    case 'sphere': geometry = new THREE.SphereGeometry(size[0], 16, 16); break;
+                    case 'cylinder': geometry = new THREE.CylinderGeometry(size[0], size[1], size[2], 16); break;
+                    default: geometry = new THREE.BoxGeometry(size[0], size[1], size[2]); break;
+                }
+                const material = new THREE.MeshLambertMaterial({ color });
                 const mesh = new THREE.Mesh(geometry, material);
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 return mesh;
             },
-
-            cloneModel(path) {
-                if (!this.loadedModels[path]) return null;
-                return this.loadedModels[path].clone();
-            },
-
-            distance(pos1, pos2) {
-                return pos1.distanceTo(pos2);
-            },
-
-            isColliding(obj1, obj2, threshold = 2) {
-                return this.distance(obj1.position, obj2.position) < threshold;
-            },
-
+            distance(pos1, pos2) { return pos1.distanceTo(pos2); },
+            isColliding(obj1, obj2, threshold = 2) { return this.distance(obj1.position, obj2.position) < threshold; },
             isOnPlatform(player, platform, threshold = 3) {
                 const horizontalDistance = Math.sqrt(
                     Math.pow(player.position.x - platform.position.x, 2) +
@@ -669,93 +133,61 @@
                 const verticalDistance = player.position.y - platform.position.y;
                 return horizontalDistance < threshold && verticalDistance > 0.5 && verticalDistance < 3;
             },
-
-            lerp(start, end, factor) {
-                return start + (end - start) * factor;
+            lerp(start, end, factor) { return start + (end - start) * factor; },
+            clamp(value, min, max) { return Math.max(min, Math.min(max, value)); },
+            degToRad(degrees) { return degrees * (Math.PI / 180); },
+            radToDeg(radians) { return radians * (180 / Math.PI); },
+            random(min, max) { return Math.random() * (max - min) + min; },
+            randomChoice(array) { return array[Math.floor(Math.random() * array.length)]; },
+            animateFloat(object, speed = 0.005, amplitude = 0.3, offset = 0) {
+                const time = Date.now() * speed + offset;
+                object.position.y += Math.sin(time) * amplitude * 0.016;
             },
-
-            clamp(value, min, max) {
-                return Math.max(min, Math.min(max, value));
-            },
-
-            degToRad(degrees) {
-                return degrees * (Math.PI / 180);
-            },
-
-            animateFloat(object, speed = 0.005, amplitude = 0.3) {
-                const time = Date.now() * speed;
-                const originalY = object.userData.originalY || object.position.y;
-                object.userData.originalY = originalY;
-                object.position.y = originalY + Math.sin(time) * amplitude * 0.01;
-            },
-
             animateRotate(object, speedX = 0, speedY = 0.02, speedZ = 0) {
                 object.rotation.x += speedX;
                 object.rotation.y += speedY;
                 object.rotation.z += speedZ;
             },
-
             updateUI(id, value) {
                 const element = document.getElementById(id);
                 if (element) element.textContent = value;
             },
-
             showMessage(title, text, buttonText = 'Continue', callback = null) {
                 const messageDiv = document.getElementById('gameMessage');
                 const titleElement = document.getElementById('messageTitle');
                 const textElement = document.getElementById('messageText');
                 const buttonElement = document.getElementById('messageButton');
-
                 titleElement.textContent = title;
                 textElement.textContent = text;
                 buttonElement.textContent = buttonText;
-                
                 if (callback) buttonElement.onclick = callback;
                 messageDiv.classList.remove('hidden');
             },
-
-            hideMessage() {
-                document.getElementById('gameMessage').classList.add('hidden');
-            },
-
+            hideMessage() { document.getElementById('gameMessage').classList.add('hidden'); },
             togglePauseMenu(show) {
                 const pauseMenu = document.getElementById('pauseMenu');
-                if (show) {
-                    pauseMenu.classList.remove('hidden');
-                } else {
-                    pauseMenu.classList.add('hidden');
-                }
+                if (show) pauseMenu.classList.remove('hidden');
+                else pauseMenu.classList.add('hidden');
             },
-
             updateLoadingProgress(progress) {
                 const fillElement = document.getElementById('loadingFill');
                 const percentElement = document.getElementById('loadingPercent');
-                
                 if (fillElement) fillElement.style.width = progress + '%';
                 if (percentElement) percentElement.textContent = Math.round(progress) + '%';
             },
-
             showGameUI() {
-                const loadingDiv = document.getElementById('loading');
-                const gameUI = document.getElementById('gameUI');
-                
-                if (loadingDiv) loadingDiv.style.display = 'none';
-                if (gameUI) {
-                    gameUI.style.display = 'block';
-                    gameUI.classList.add('fade-in');
-                }
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('gameUI').style.display = 'block';
+                document.getElementById('gameUI').classList.add('fade-in');
             },
-
             createParticleEffect(scene, position, color = 0xFFD700) {
                 const particles = [];
                 const particleCount = 10;
-                
                 for (let i = 0; i < particleCount; i++) {
                     const particle = new THREE.Mesh(
                         new THREE.SphereGeometry(0.05, 8, 8),
                         new THREE.MeshBasicMaterial({ color })
                     );
-                    
                     particle.position.copy(position);
                     particle.velocity = new THREE.Vector3(
                         (Math.random() - 0.5) * 0.2,
@@ -763,345 +195,177 @@
                         (Math.random() - 0.5) * 0.2
                     );
                     particle.life = 1.0;
-                    
                     particles.push(particle);
                     scene.add(particle);
                 }
-                
                 const animateParticles = () => {
                     particles.forEach((particle, index) => {
                         particle.position.add(particle.velocity);
                         particle.velocity.y -= 0.01;
                         particle.life -= 0.02;
                         particle.material.opacity = particle.life;
-                        
                         if (particle.life <= 0) {
                             scene.remove(particle);
                             particles.splice(index, 1);
                         }
                     });
-                    
-                    if (particles.length > 0) {
-                        requestAnimationFrame(animateParticles);
-                    }
+                    if (particles.length > 0) requestAnimationFrame(animateParticles);
                 };
-                
                 animateParticles();
             }
         };
 
-        // Enhanced Camera Controls
-        class CameraController {
-            constructor(camera, player) {
-                this.camera = camera;
-                this.player = player;
-                
-                // Camera modes
-                this.modes = {
-                    FREE_ORBIT: 'Free Orbit',
-                    FOLLOW: 'Follow',
-                    FIXED: 'Fixed'
-                };
-                this.currentMode = this.modes.FREE_ORBIT;
-                
-                // Orbit controls
-                this.distance = 15;
-                this.minDistance = 5;
-                this.maxDistance = 50;
-                this.azimuth = Math.PI; // Start facing opposite direction (180 degrees)
-                this.elevation = 0.3; // Vertical rotation
-                this.minElevation = -Math.PI / 3;
-                this.maxElevation = Math.PI / 3;
-                
-                // Mouse state
-                this.isMouseDown = false;
-                this.lastMouseX = 0;
-                this.lastMouseY = 0;
-                
-                // Smooth movement
-                this.targetPosition = new THREE.Vector3();
-                this.targetLookAt = new THREE.Vector3();
-                
-                this.setupControls();
-            }
-            
-            setupControls() {
-                const canvas = document.querySelector('canvas');
-                
-                // Mouse controls
-                canvas.addEventListener('mousedown', (event) => {
-                    this.isMouseDown = true;
-                    this.lastMouseX = event.clientX;
-                    this.lastMouseY = event.clientY;
-                });
-                
-                canvas.addEventListener('mousemove', (event) => {
-                    if (!this.isMouseDown || this.currentMode !== this.modes.FREE_ORBIT) return;
-                    
-                    const deltaX = event.clientX - this.lastMouseX;
-                    const deltaY = event.clientY - this.lastMouseY;
-                    
-                    this.azimuth -= deltaX * 0.01;
-                    this.elevation = Utils.clamp(
-                        this.elevation - deltaY * 0.01,
-                        this.minElevation,
-                        this.maxElevation
-                    );
-                    
-                    this.lastMouseX = event.clientX;
-                    this.lastMouseY = event.clientY;
-                });
-                
-                canvas.addEventListener('mouseup', () => {
-                    this.isMouseDown = false;
-                });
-                
-                // Wheel zoom
-                canvas.addEventListener('wheel', (event) => {
-                    event.preventDefault();
-                    if (this.currentMode !== this.modes.FREE_ORBIT) return;
-                    
-                    this.distance = Utils.clamp(
-                        this.distance + event.deltaY * 0.01,
-                        this.minDistance,
-                        this.maxDistance
-                    );
-                });
-                
-                // Keyboard controls
-                document.addEventListener('keydown', (event) => {
-                    switch(event.code) {
-                        case 'KeyC':
-                            this.toggleMode();
-                            break;
-                        case 'KeyF':
-                            this.focusPlayer();
-                            break;
-                    }
-                });
-            }
-            
-            toggleMode() {
-                const modes = Object.values(this.modes);
-                const currentIndex = modes.indexOf(this.currentMode);
-                const nextIndex = (currentIndex + 1) % modes.length;
-                this.currentMode = modes[nextIndex];
-                
-                document.getElementById('cameraModeText').textContent = this.currentMode;
-                
-                if (this.currentMode === this.modes.FOLLOW) {
-                    this.focusPlayer();
-                }
-            }
-            
-            focusPlayer() {
-                // Smoothly move camera to focus on player with corrected orientation
-                this.azimuth = Math.PI; // Face opposite direction
-                this.elevation = 0.3;
-                this.distance = 15;
-            }
-            
-            update() {
-                const playerPos = this.player.position;
-                
-                switch(this.currentMode) {
-                    case this.modes.FREE_ORBIT:
-                        this.updateOrbitCamera(playerPos);
-                        break;
-                    case this.modes.FOLLOW:
-                        this.updateFollowCamera(playerPos);
-                        break;
-                    case this.modes.FIXED:
-                        this.updateFixedCamera(playerPos);
-                        break;
-                }
-            }
-            
-            updateOrbitCamera(playerPos) {
-                // Calculate camera position in spherical coordinates
-                const x = playerPos.x + this.distance * Math.cos(this.elevation) * Math.sin(this.azimuth);
-                const y = playerPos.y + this.distance * Math.sin(this.elevation) + 5;
-                const z = playerPos.z + this.distance * Math.cos(this.elevation) * Math.cos(this.azimuth);
-                
-                this.targetPosition.set(x, y, z);
-                this.targetLookAt.copy(playerPos).add(new THREE.Vector3(0, 1, 0));
-                
-                // Smooth camera movement
-                this.camera.position.lerp(this.targetPosition, 0.1);
-                
-                // Look at player
-                const lookAtPos = this.targetLookAt.clone();
-                this.camera.lookAt(lookAtPos);
-            }
-            
-            updateFollowCamera(playerPos) {
-                // Traditional follow camera with slight orbit influence
-                const idealPos = new THREE.Vector3(
-                    playerPos.x + Math.sin(this.azimuth) * 10,
-                    playerPos.y + 8,
-                    playerPos.z + Math.cos(this.azimuth) * 10
-                );
-                
-                this.camera.position.lerp(idealPos, 0.05);
-                
-                const lookAtPos = new THREE.Vector3(
-                    playerPos.x + this.player.velocity.x * 2,
-                    playerPos.y + 1,
-                    playerPos.z + this.player.velocity.z * 2
-                );
-                
-                this.camera.lookAt(lookAtPos);
-            }
-            
-            updateFixedCamera(playerPos) {
-                // Fixed camera position with smooth look-at
-                const fixedPos = new THREE.Vector3(playerPos.x, playerPos.y + 15, playerPos.z + 20);
-                this.camera.position.lerp(fixedPos, 0.02);
-                this.camera.lookAt(playerPos);
-            }
-        }
-
-        // Enhanced Player class
+        // Player Class
         class Player {
             constructor(scene) {
                 this.scene = scene;
                 this.mesh = null;
-                
                 this.velocity = new THREE.Vector3(0, 0, 0);
                 this.position = new THREE.Vector3(0, 5, 0);
                 this.rotation = 0;
-                
                 this.speed = 0.15;
                 this.jumpForce = 0.4;
                 this.gravity = -0.02;
-                
                 this.isGrounded = false;
                 this.isJumping = false;
+                this.isClimbing = false;
                 this.lives = 3;
                 this.isAlive = true;
-                
-                this.keys = {
-                    left: false, right: false, forward: false, backward: false,
-                    space: false, shift: false
-                };
-                
+                this.keysCollected = 0;
+                this.keys = { left: false, right: false, forward: false, backward: false, space: false, shift: false, interact: false, climb: false };
+                this.camera = null;
+                this.cameraMode = 'follow';
+                this.orbitControls = null;
                 this.init();
                 this.setupInput();
             }
-            
             init() {
                 const geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 8);
-                const material = new THREE.MeshLambertMaterial({ 
-                    color: 0x4CAF50,
-                    transparent: true,
-                    opacity: 0.9
-                });
-                
+                const material = new THREE.MeshLambertMaterial({ color: 0x4CAF50, transparent: true, opacity: 0.9 });
                 this.mesh = new THREE.Mesh(geometry, material);
                 this.mesh.position.copy(this.position);
                 this.mesh.castShadow = true;
                 this.mesh.receiveShadow = true;
-                
                 const faceGeometry = new THREE.SphereGeometry(0.1, 8, 8);
                 const faceMaterial = new THREE.MeshBasicMaterial({ color: 0x2196F3 });
                 this.face = new THREE.Mesh(faceGeometry, faceMaterial);
                 this.face.position.set(0, 0.3, 0.4);
                 this.mesh.add(this.face);
-                
                 this.scene.add(this.mesh);
             }
-            
             setupInput() {
-                document.addEventListener('keydown', (event) => this.handleKeyDown(event));
-                document.addEventListener('keyup', (event) => this.handleKeyUp(event));
+                document.addEventListener('keydown', (event) => {
+                    switch(event.code) {
+                        case 'KeyW': case 'ArrowUp': this.keys.forward = true; break;
+                        case 'KeyS': case 'ArrowDown': this.keys.backward = true; break;
+                        case 'KeyA': case 'ArrowLeft': this.keys.left = true; break;
+                        case 'KeyD': case 'ArrowRight': this.keys.right = true; break;
+                        case 'Space': this.keys.space = true; break;
+                        case 'ShiftLeft': case 'ShiftRight': this.keys.shift = true; break;
+                        case 'KeyE': this.keys.interact = true; break;
+                        case 'KeyL': this.keys.climb = true; break;
+                        case 'KeyC': this.toggleCameraMode(); break;
+                        case 'KeyF': this.focusCamera(); break;
+                    }
+                    if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
+                        event.preventDefault();
+                    }
+                });
+                document.addEventListener('keyup', (event) => {
+                    switch(event.code) {
+                        case 'KeyW': case 'ArrowUp': this.keys.forward = false; break;
+                        case 'KeyS': case 'ArrowDown': this.keys.backward = false; break;
+                        case 'KeyA': case 'ArrowLeft': this.keys.left = false; break;
+                        case 'KeyD': case 'ArrowRight': this.keys.right = false; break;
+                        case 'Space': this.keys.space = false; break;
+                        case 'ShiftLeft': case 'ShiftRight': this.keys.shift = false; break;
+                        case 'KeyE': this.keys.interact = false; break;
+                        case 'KeyL': this.keys.climb = false; break;
+                    }
+                });
+                let isDragging = false;
+                let previousMousePosition = { x: 0, y: 0 };
+                document.addEventListener('mousedown', (e) => { isDragging = true; previousMousePosition = { x: e.clientX, y: e.clientY }; });
+                document.addEventListener('mouseup', () => { isDragging = false; });
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging && this.cameraMode === 'orbit') {
+                        const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
+                        this.orbitControls.theta -= deltaMove.x * 0.005;
+                        this.orbitControls.phi -= deltaMove.y * 0.005;
+                        this.orbitControls.phi = Utils.clamp(this.orbitControls.phi, 0.1, Math.PI - 0.1);
+                        previousMousePosition = { x: e.clientX, y: e.clientY };
+                    }
+                });
+                document.addEventListener('wheel', (e) => {
+                    if (this.cameraMode === 'orbit') {
+                        this.orbitControls.distance += e.deltaY * 0.01;
+                        this.orbitControls.distance = Utils.clamp(this.orbitControls.distance, 5, 50);
+                    }
+                });
+                document.addEventListener('contextmenu', (event) => event.preventDefault());
             }
-            
-            handleKeyDown(event) {
-                switch(event.code) {
-                    // Try swapping the key assignments to fix movement
-                    case 'KeyW': case 'ArrowUp': this.keys.forward = true; break;    // W = forward
-                    case 'KeyS': case 'ArrowDown': this.keys.backward = true; break; // S = backward
-                    case 'KeyA': case 'ArrowLeft': this.keys.left = true; break;     // A = left
-                    case 'KeyD': case 'ArrowRight': this.keys.right = true; break;   // D = right
-                    case 'Space': this.keys.space = true; event.preventDefault(); break;
-                    case 'ShiftLeft': case 'ShiftRight': this.keys.shift = true; break;
+            toggleCameraMode() {
+                this.cameraMode = this.cameraMode === 'follow' ? 'orbit' : 'follow';
+                Utils.updateUI('cameraMode', `Camera Mode: ${this.cameraMode === 'follow' ? 'Follow' : 'Free Orbit'}`);
+                document.getElementById('cameraControls').classList.toggle('hidden', this.cameraMode === 'follow');
+            }
+            focusCamera() {
+                if (this.cameraMode === 'orbit') {
+                    this.orbitControls.theta = -Math.PI / 2;
+                    this.orbitControls.phi = Math.PI / 4;
+                    this.orbitControls.distance = 12;
                 }
             }
-            
-            handleKeyUp(event) {
-                switch(event.code) {
-                    case 'KeyW': case 'ArrowUp': this.keys.forward = false; break;
-                    case 'KeyS': case 'ArrowDown': this.keys.backward = false; break;
-                    case 'KeyA': case 'ArrowLeft': this.keys.left = false; break;
-                    case 'KeyD': case 'ArrowRight': this.keys.right = false; break;
-                    case 'Space': this.keys.space = false; break;
-                    case 'ShiftLeft': case 'ShiftRight': this.keys.shift = false; break;
-                }
-            }
-            
-            update(platforms = [], collectibles = [], hazards = []) {
+            update(platforms = [], collectibles = [], hazards = [], interactive = []) {
                 if (!this.isAlive) return;
-                
                 this.updateMovement();
                 this.updatePhysics();
                 this.checkPlatformCollisions(platforms);
                 this.checkCollectibleCollisions(collectibles);
                 this.checkHazardCollisions(hazards);
+                this.checkInteractiveCollisions(interactive);
                 this.checkBoundaries();
                 this.updateMesh();
             }
-            
             updateMovement() {
                 const currentSpeed = this.keys.shift ? this.speed * 1.5 : this.speed;
-                
-                // Try completely inverted directions:
-                if (this.keys.forward) {
-                    this.velocity.z = currentSpeed;  // W -> positive Z (backward in world coords)
-                } else if (this.keys.backward) {
-                    this.velocity.z = -currentSpeed; // S -> negative Z (forward in world coords)
-                } else {
-                    this.velocity.z *= 0.8;
-                }
-                
-                if (this.keys.left) {
-                    this.velocity.x = currentSpeed;  // A -> positive X (right in world coords)
-                } else if (this.keys.right) {
-                    this.velocity.x = -currentSpeed; // D -> negative X (left in world coords)
-                } else {
-                    this.velocity.x *= 0.8;
-                }
-                
+                if (this.keys.left) this.velocity.x = -currentSpeed;
+                else if (this.keys.right) this.velocity.x = currentSpeed;
+                else this.velocity.x *= 0.8;
+                if (this.keys.forward) this.velocity.z = -currentSpeed;
+                else if (this.keys.backward) this.velocity.z = currentSpeed;
+                else this.velocity.z *= 0.8;
                 if (this.keys.space && this.isGrounded && !this.isJumping) {
                     this.velocity.y = this.jumpForce;
                     this.isGrounded = false;
                     this.isJumping = true;
+                    if (this.jumpSound) this.jumpSound.play();
                 }
-                
+                if (this.isClimbing && this.keys.climb) {
+                    this.velocity.y = 0.1;
+                    this.gravity = 0;
+                } else {
+                    this.gravity = -0.02;
+                }
                 const maxSpeed = currentSpeed * 1.2;
                 this.velocity.x = Utils.clamp(this.velocity.x, -maxSpeed, maxSpeed);
                 this.velocity.z = Utils.clamp(this.velocity.z, -maxSpeed, maxSpeed);
             }
-            
             updatePhysics() {
-                if (!this.isGrounded) {
-                    this.velocity.y += this.gravity;
-                }
-                
+                if (!this.isGrounded) this.velocity.y += this.gravity;
                 this.position.x += this.velocity.x;
                 this.position.y += this.velocity.y;
                 this.position.z += this.velocity.z;
-                
                 if (this.position.y <= 1) {
                     this.position.y = 1;
                     this.velocity.y = 0;
                     this.isGrounded = true;
                     this.isJumping = false;
+                    this.isClimbing = false;
                 }
             }
-            
             checkPlatformCollisions(platforms) {
                 let onPlatform = false;
-                
                 platforms.forEach(platform => {
                     if (Utils.isOnPlatform(this, platform)) {
                         if (this.velocity.y <= 0) {
@@ -1109,16 +373,13 @@
                             this.velocity.y = 0;
                             this.isGrounded = true;
                             this.isJumping = false;
+                            this.isClimbing = false;
                             onPlatform = true;
                         }
                     }
                 });
-                
-                if (!onPlatform && this.position.y > 1.1) {
-                    this.isGrounded = false;
-                }
+                if (!onPlatform && this.position.y > 1.1) this.isGrounded = false;
             }
-            
             checkCollectibleCollisions(collectibles) {
                 collectibles.forEach(collectible => {
                     if (!collectible.userData.collected && Utils.isColliding(this, collectible, 1.5)) {
@@ -1126,7 +387,6 @@
                     }
                 });
             }
-            
             checkHazardCollisions(hazards) {
                 hazards.forEach(hazard => {
                     if (Utils.isColliding(this, hazard, 1.5)) {
@@ -1134,146 +394,166 @@
                     }
                 });
             }
-            
+            checkInteractiveCollisions(interactive) {
+                interactive.forEach(obj => {
+                    if (Utils.isColliding(this, obj, 2)) {
+                        if (obj.userData.type === 'ladder' && this.keys.climb) {
+                            this.isClimbing = true;
+                            this.position.x = obj.position.x;
+                            this.position.z = obj.position.z;
+                        } else if (obj.userData.type === 'lever' && this.keys.interact && !obj.userData.activated) {
+                            obj.userData.activated = true;
+                            obj.rotation.z = Utils.degToRad(45);
+                            game.unlockDoor();
+                        } else if (obj.userData.type === 'chest' && this.keys.interact && !obj.userData.opened) {
+                            obj.userData.opened = true;
+                            obj.position.y += 0.5;
+                            game.addScore(200);
+                            Utils.createParticleEffect(this.scene, obj.position.clone(), 0xFFD700);
+                        }
+                    } else if (obj.userData.type === 'ladder') {
+                        this.isClimbing = false;
+                    }
+                });
+            }
             collectItem(collectible) {
                 collectible.userData.collected = true;
                 collectible.visible = false;
-                
                 Utils.createParticleEffect(this.scene, collectible.position.clone(), 0xFFD700);
-                
+                if (this.coinSound) this.coinSound.play();
                 const type = collectible.userData.type || 'coin';
-                
                 switch(type) {
-                    case 'coin-gold':
-                        game.addScore(100);
-                        game.addCoin();
-                        break;
-                    case 'coin-silver':
-                        game.addScore(50);
-                        game.addCoin();
-                        break;
-                    case 'coin-bronze':
-                        game.addScore(25);
-                        game.addCoin();
-                        break;
-                    case 'heart':
-                        this.addLife();
-                        game.addScore(200);
-                        break;
-                    case 'jewel':
-                        game.addScore(500);
-                        break;
-                    case 'key':
-                        game.addScore(300);
-                        break;
-                    default:
-                        game.addScore(50);
-                        game.addCoin();
-                        break;
+                    case 'coin-gold': game.addScore(100); game.addCoin(); break;
+                    case 'coin-silver': game.addScore(50); game.addCoin(); break;
+                    case 'coin-bronze': game.addScore(25); game.addCoin(); break;
+                    case 'heart': this.addLife(); game.addScore(200); break;
+                    case 'jewel': game.addScore(500); break;
+                    case 'key': this.keysCollected++; game.addScore(300); Utils.updateUI('keys', this.keysCollected); break;
+                    default: game.addScore(50); game.addCoin(); break;
                 }
             }
-            
             takeDamage() {
                 if (!this.isAlive) return;
-                
                 this.lives--;
                 Utils.updateUI('lives', this.lives);
-                
                 Utils.createParticleEffect(this.scene, this.position.clone(), 0xFF0000);
-                
                 this.velocity.y = 0.2;
                 this.velocity.x *= -2;
                 this.velocity.z *= -2;
-                
-                if (this.lives <= 0) {
-                    this.die();
-                } else {
+                if (this.lives <= 0) this.die();
+                else {
                     this.mesh.material.color.setHex(0xFF0000);
-                    setTimeout(() => {
-                        this.mesh.material.color.setHex(0x4CAF50);
-                    }, 500);
+                    setTimeout(() => { this.mesh.material.color.setHex(0x4CAF50); }, 500);
                 }
             }
-            
             addLife() {
                 this.lives++;
                 Utils.updateUI('lives', this.lives);
             }
-            
             die() {
                 this.isAlive = false;
                 this.mesh.material.color.setHex(0x666666);
                 this.mesh.material.opacity = 0.5;
-                
-                setTimeout(() => {
-                    game.playerDied();
-                }, 1000);
+                setTimeout(() => { game.playerDied(); }, 1000);
             }
-            
             checkBoundaries() {
                 if (this.position.y < -20) {
                     this.takeDamage();
                     this.respawn();
                 }
-                
-                const maxDistance = 100;
+                const maxDistance = 200;
                 this.position.x = Utils.clamp(this.position.x, -maxDistance, maxDistance);
                 this.position.z = Utils.clamp(this.position.z, -maxDistance, maxDistance);
             }
-            
             respawn() {
-                this.position.set(0, 5, 0);
+                const spawnPos = game.level.getPlayerSpawnPosition();
+                this.position.copy(spawnPos);
                 this.velocity.set(0, 0, 0);
                 this.isGrounded = false;
                 this.isJumping = false;
+                this.isClimbing = false;
             }
-            
             updateMesh() {
                 if (this.mesh) {
                     this.mesh.position.copy(this.position);
-                    
                     if (Math.abs(this.velocity.x) > 0.01 || Math.abs(this.velocity.z) > 0.01) {
                         const angle = Math.atan2(this.velocity.x, this.velocity.z);
                         this.mesh.rotation.y = Utils.lerp(this.mesh.rotation.y, angle, 0.1);
                     }
-                    
                     if (this.isGrounded && (Math.abs(this.velocity.x) > 0.01 || Math.abs(this.velocity.z) > 0.01)) {
                         this.mesh.position.y += Math.sin(Date.now() * 0.01) * 0.05;
                     }
                 }
             }
-            
-            reset(spawnPosition = new THREE.Vector3(0, 5, 0)) {
+            updateCamera(camera) {
+                if (!camera) return;
+                if (this.cameraMode === 'follow') {
+                    const idealCameraPosition = new THREE.Vector3(
+                        this.position.x,
+                        this.position.y + 8,
+                        this.position.z + 12
+                    );
+                    camera.position.lerp(idealCameraPosition, 0.05);
+                    const lookAtPosition = new THREE.Vector3(
+                        this.position.x + this.velocity.x * 2,
+                        this.position.y + 1,
+                        this.position.z + this.velocity.z * 2
+                    );
+                    camera.lookAt(lookAtPosition);
+                } else {
+                    const radius = this.orbitControls.distance;
+                    const theta = this.orbitControls.theta;
+                    const phi = this.orbitControls.phi;
+                    camera.position.x = this.position.x + radius * Math.sin(theta) * Math.sin(phi);
+                    camera.position.y = this.position.y + radius * Math.cos(phi);
+                    camera.position.z = this.position.z + radius * Math.cos(theta) * Math.sin(phi);
+                    camera.lookAt(this.position);
+                }
+            }
+            reset(spawnPosition) {
                 this.position.copy(spawnPosition);
                 this.velocity.set(0, 0, 0);
                 this.isGrounded = false;
                 this.isJumping = false;
+                this.isClimbing = false;
                 this.isAlive = true;
-                
+                this.keysCollected = 0;
+                Utils.updateUI('keys', this.keysCollected);
                 if (this.mesh) {
                     this.mesh.material.color.setHex(0x4CAF50);
                     this.mesh.material.opacity = 0.9;
                     this.mesh.position.copy(this.position);
                 }
+                this.orbitControls = { theta: -Math.PI / 2, phi: Math.PI / 4, distance: 12 };
+            }
+            setupAudio(listener) {
+                this.jumpSound = new THREE.Audio(listener);
+                this.coinSound = new THREE.Audio(listener);
+                new THREE.AudioLoader().load('assets/audio/jump.wav', (buffer) => {
+                    this.jumpSound.setBuffer(buffer);
+                    this.jumpSound.setVolume(0.5);
+                });
+                new THREE.AudioLoader().load('assets/audio/coin.wav', (buffer) => {
+                    this.coinSound.setBuffer(buffer);
+                    this.coinSound.setVolume(0.5);
+                });
             }
         }
 
-        // Enhanced Level class with 3D spatial design
+        // Level Class
         class Level {
             constructor(scene, gltfLoader) {
                 this.scene = scene;
                 this.gltfLoader = gltfLoader;
-                
                 this.platforms = [];
                 this.collectibles = [];
                 this.hazards = [];
                 this.environment = [];
                 this.interactive = [];
-                this.movingPlatforms = [];
-                
                 this.currentLevel = 1;
+                this.levelData = null;
                 this.totalCoins = 0;
-                
+                this.unlockedDoors = [];
                 this.assetPaths = {
                     platforms: {
                         'grass': 'assets/models/platforms/block-grass.glb',
@@ -1282,12 +562,8 @@
                         'grass-curve': 'assets/models/platforms/block-grass-curve.glb',
                         'platform': 'assets/models/platforms/platform.glb',
                         'platform-ramp': 'assets/models/platforms/platform-ramp.glb',
-                        'stone': 'assets/models/platforms/block-stone.glb',
-                        'wood': 'assets/models/platforms/block-wood.glb',
-                        'metal': 'assets/models/platforms/block-metal.glb',
-                        'snow': 'assets/models/platforms/block-snow.glb',
-                        'bridge': 'assets/models/platforms/bridge.glb',
-                        'moving': 'assets/models/platforms/platform-moving.glb'
+                        'terrain-dirt': 'assets/models/platforms/block-grass-large.glb', // Replaced terrain-dirt
+                        'terrain-rock': 'assets/models/platforms/block-snow-large.glb' // Replaced terrain-rock
                     },
                     collectibles: {
                         'coin-gold': 'assets/models/collectibles/coin-gold.glb',
@@ -1295,505 +571,244 @@
                         'coin-bronze': 'assets/models/collectibles/coin-bronze.glb',
                         'heart': 'assets/models/collectibles/heart.glb',
                         'jewel': 'assets/models/collectibles/jewel.glb',
-                        'key': 'assets/models/collectibles/key.glb',
-                        'gem-blue': 'assets/models/collectibles/gem-blue.glb',
-                        'gem-red': 'assets/models/collectibles/gem-red.glb',
-                        'gem-green': 'assets/models/collectibles/gem-green.glb',
-                        'star': 'assets/models/collectibles/star.glb',
-                        'power-up': 'assets/models/collectibles/power-up.glb'
+                        'key': 'assets/models/collectibles/key.glb'
                     },
                     environment: {
                         'tree': 'assets/models/environment/tree.glb',
                         'tree-pine': 'assets/models/environment/tree-pine.glb',
-                        'tree-oak': 'assets/models/environment/tree-oak.glb',
-                        'tree-palm': 'assets/models/environment/tree-palm.glb',
                         'rocks': 'assets/models/environment/rocks.glb',
-                        'rock-large': 'assets/models/environment/rock-large.glb',
-                        'rock-small': 'assets/models/environment/rock-small.glb',
                         'grass': 'assets/models/environment/grass.glb',
-                        'grass-patch': 'assets/models/environment/grass-patch.glb',
                         'flowers': 'assets/models/environment/flowers.glb',
-                        'flower-red': 'assets/models/environment/flower-red.glb',
-                        'flower-blue': 'assets/models/environment/flower-blue.glb',
-                        'bush': 'assets/models/environment/bush.glb',
-                        'mushroom': 'assets/models/environment/mushroom.glb',
-                        'mushroom-red': 'assets/models/environment/mushroom-red.glb',
-                        'crystal': 'assets/models/environment/crystal.glb',
-                        'stone-pillar': 'assets/models/environment/stone-pillar.glb',
-                        'log': 'assets/models/environment/log.glb'
+                        'hedge': 'assets/models/environment/hedge.glb', // Replaced bush
+                        'mushroom': 'assets/models/environment/mushrooms.glb' // Replaced mushroom
                     },
                     interactive: {
                         'crate': 'assets/models/interactive/crate.glb',
-                        'crate-metal': 'assets/models/interactive/crate-metal.glb',
-                        'barrel': 'assets/models/interactive/barrel.glb',
                         'chest': 'assets/models/interactive/chest.glb',
-                        'chest-large': 'assets/models/interactive/chest-large.glb',
                         'button': 'assets/models/interactive/button-round.glb',
-                        'button-square': 'assets/models/interactive/button-square.glb',
-                        'lever': 'assets/models/interactive/lever.glb',
                         'door': 'assets/models/interactive/door-rotate.glb',
-                        'gate': 'assets/models/interactive/gate.glb',
+                        'lever': 'assets/models/interactive/lever.glb',
                         'flag': 'assets/models/interactive/flag.glb',
-                        'flag-banner': 'assets/models/interactive/flag-banner.glb',
-                        'sign': 'assets/models/interactive/sign.glb',
-                        'signpost': 'assets/models/interactive/signpost.glb',
-                        'torch': 'assets/models/interactive/torch.glb',
-                        'lantern': 'assets/models/interactive/lantern.glb'
+                        'switch': 'assets/models/interactive/button-square.glb' // Replaced switch
                     },
                     hazards: {
                         'spike': 'assets/models/hazards/spike-block.glb',
-                        'spike-ball': 'assets/models/hazards/spike-ball.glb',
                         'saw': 'assets/models/hazards/saw.glb',
-                        'saw-blade': 'assets/models/hazards/saw-blade.glb',
                         'trap': 'assets/models/hazards/trap-spikes.glb',
-                        'bomb': 'assets/models/hazards/bomb.glb',
-                        'lava': 'assets/models/hazards/lava.glb',
-                        'fire': 'assets/models/hazards/fire.glb',
-                        'crusher': 'assets/models/hazards/crusher.glb'
+                        'bomb': 'assets/models/hazards/bomb.glb'
                     },
                     structures: {
                         'fence': 'assets/models/structures/fence-low-straight.glb',
-                        'fence-corner': 'assets/models/structures/fence-corner.glb',
-                        'fence-gate': 'assets/models/structures/fence-gate.glb',
                         'ladder': 'assets/models/structures/ladder.glb',
-                        'ladder-long': 'assets/models/structures/ladder-long.glb',
                         'poles': 'assets/models/structures/poles.glb',
-                        'column': 'assets/models/structures/column.glb',
-                        'pillar': 'assets/models/structures/pillar.glb',
-                        'bridge-rope': 'assets/models/structures/bridge-rope.glb',
-                        'bridge-stone': 'assets/models/structures/bridge-stone.glb',
-                        'wall': 'assets/models/structures/wall.glb',
-                        'wall-corner': 'assets/models/structures/wall-corner.glb'
-                    },
-                    decorations: {
-                        'banner': 'assets/models/decorations/banner.glb',
-                        'statue': 'assets/models/decorations/statue.glb',
-                        'fountain': 'assets/models/decorations/fountain.glb',
-                        'campfire': 'assets/models/decorations/campfire.glb',
-                        'tent': 'assets/models/decorations/tent.glb',
-                        'windmill': 'assets/models/decorations/windmill.glb',
-                        'well': 'assets/models/decorations/well.glb',
-                        'cart': 'assets/models/decorations/cart.glb'
+                        'bridge': 'assets/models/structures/platform-fortified.glb' // Replaced bridge
                     }
                 };
+                this.levelData = {
+                    spawn: { x: 0, y: 5, z: 0 },
+                    goal: { type: 'collect_keys', count: 2 },
+                    platforms: [
+                        { type: 'terrain-dirt', position: { x: 0, y: 0, z: 0 }, scale: { x: 20, y: 1, z: 20 } }, // Uses block-grass-large
+                        { type: 'terrain-rock', position: { x: 15, y: 1, z: 10 }, scale: { x: 5, y: 2, z: 5 } }, // Uses block-snow-large
+                        { type: 'platform-ramp', position: { x: -10, y: 1, z: 15 }, rotation: { y: 90 } },
+                        { type: 'grass-large', position: { x: -15, y: 3, z: -10 }, scale: { x: 8, y: 1, z: 8 } }
+                    ],
+                    collectibles: [
+                        { type: 'coin-gold', position: { x: 5, y: 2, z: 5 } },
+                        { type: 'coin-silver', position: { x: -5, y: 2, z: -5 } },
+                        { type: 'key', position: { x: 15, y: 3, z: 10 } },
+                        { type: 'key', position: { x: -15, y: 4, z: -10 } },
+                        { type: 'heart', position: { x: 0, y: 2, z: 15 } }
+                    ],
+                    hazards: [
+                        { type: 'spike', position: { x: 10, y: 1, z: -5 } },
+                        { type: 'saw', position: { x: -10, y: 2, z: 5 } }
+                    ],
+                    environment: [
+                        { type: 'tree', position: { x: 8, y: 1, z: 8 }, scale: { x: 2, y: 2, z: 2 } },
+                        { type: 'hedge', position: { x: -8, y: 1, z: 8 } }, // Uses hedge
+                        { type: 'mushroom', position: { x: 0, y: 1, z: -8 } } // Uses mushrooms
+                    ],
+                    interactive: [
+                        { type: 'ladder', position: { x: -15, y: 2, z: -10 }, scale: { x: 1, y: 2, z: 1 } },
+                        { type: 'lever', position: { x: 5, y: 1, z: -5 } },
+                        { type: 'door', position: { x: 15, y: 1, z: 0 }, userData: { locked: true } },
+                        { type: 'chest', position: { x: 0, y: 1, z: -15 } },
+                        { type: 'bridge', position: { x: 10, y: 2, z: -10 }, scale: { x: 5, y: 1, z: 2 } } // Uses platform-fortified
+                    ]
+                };
             }
-            
             async loadLevel(levelNumber) {
                 try {
                     this.clearLevel();
-                    
-                    const levelData = this.getEnhancedLevelData(levelNumber);
                     this.currentLevel = levelNumber;
-                    
-                    await this.createLevelObjects(levelData);
+                    await this.createPlatforms();
+                    await this.createCollectibles();
+                    await this.createHazards();
+                    await this.createEnvironment();
+                    await this.createInteractive();
                     this.countTotalCoins();
-                    
-                    console.log(`Enhanced Level ${levelNumber} loaded successfully`);
                     return true;
-                    
                 } catch (error) {
                     console.error(`Failed to load level ${levelNumber}:`, error);
                     return false;
                 }
             }
-            
-            getEnhancedLevelData(levelNumber) {
-                switch(levelNumber) {
-                    case 1:
-                        return {
-                            name: "Enchanted Garden Towers",
-                            spawn: { x: 0, y: 5, z: 0 },
-                            platforms: [
-                                // Starting garden area
-                                { type: "grass", position: { x: 0, y: 0, z: 0 }, scale: { x: 4, y: 1, z: 4 } },
-                                { type: "grass", position: { x: -4, y: 0, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass", position: { x: 4, y: 0, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
-                                
-                                // Main spiral tower requiring camera rotation
-                                { type: "grass", position: { x: 8, y: 2, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                { type: "grass-corner", position: { x: 12, y: 4, z: 4 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass", position: { x: 8, y: 6, z: 8 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                { type: "grass-corner", position: { x: 4, y: 8, z: 4 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass", position: { x: 8, y: 10, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                { type: "grass-corner", position: { x: 12, y: 12, z: -4 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-large", position: { x: 8, y: 14, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
-                                
-                                // Hidden garden paths requiring camera movement
-                                { type: "wood", position: { x: -8, y: 3, z: 6 }, scale: { x: 2, y: 0.5, z: 2 } },
-                                { type: "wood", position: { x: -12, y: 5, z: -8 }, scale: { x: 2, y: 0.5, z: 2 } },
-                                { type: "stone", position: { x: 18, y: 6, z: -10 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-curve", position: { x: 16, y: 8, z: -6 }, scale: { x: 2, y: 1, z: 2 } },
-                                
-                                // Vertical garden climbing section
-                                { type: "grass", position: { x: 22, y: 2, z: 2 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass", position: { x: 24, y: 5, z: 5 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass", position: { x: 22, y: 8, z: 8 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass", position: { x: 20, y: 11, z: 5 }, scale: { x: 2, y: 1, z: 2 } },
-                                { type: "grass-large", position: { x: 22, y: 16, z: 2 }, scale: { x: 3, y: 1, z: 3 } },
-                                
-                                // Moving wooden bridges
-                                { type: "bridge", position: { x: 15, y: 9, z: 2 }, scale: { x: 2, y: 0.3, z: 1 }, moving: true, path: [
-                                    { x: 15, y: 9, z: 2 }, { x: 15, y: 9, z: 8 }, { x: 15, y: 9, z: 2 }
-                                ]},
-                                { type: "bridge", position: { x: 10, y: 13, z: -6 }, scale: { x: 2, y: 0.3, z: 1 }, moving: true, path: [
-                                    { x: 10, y: 13, z: -6 }, { x: 4, y: 13, z: -6 }, { x: 10, y: 13, z: -6 }
-                                ]}
-                            ],
-                            collectibles: [
-                                // Spiral tower coins
-                                { type: "coin-gold", position: { x: 10, y: 3, z: 2 } },
-                                { type: "coin-gold", position: { x: 14, y: 5, z: 6 } },
-                                { type: "coin-silver", position: { x: 10, y: 7, z: 10 } },
-                                { type: "coin-gold", position: { x: 6, y: 9, z: 6 } },
-                                { type: "coin-gold", position: { x: 10, y: 11, z: 2 } },
-                                { type: "coin-silver", position: { x: 14, y: 13, z: -2 } },
-                                { type: "star", position: { x: 8, y: 17, z: -8 } },
-                                
-                                // Hidden gems requiring camera exploration
-                                { type: "gem-blue", position: { x: -8, y: 6, z: 6 } },
-                                { type: "gem-red", position: { x: -12, y: 8, z: -8 } },
-                                { type: "gem-green", position: { x: 18, y: 9, z: -10 } },
-                                { type: "jewel", position: { x: 16, y: 11, z: -6 } },
-                                
-                                // Vertical challenge rewards
-                                { type: "coin-gold", position: { x: 24, y: 8, z: 5 } },
-                                { type: "coin-gold", position: { x: 22, y: 11, z: 8 } },
-                                { type: "heart", position: { x: 22, y: 19, z: 2 } },
-                                
-                                // Secret areas
-                                { type: "key", position: { x: -4, y: 3, z: -4 } },
-                                { type: "power-up", position: { x: 4, y: 3, z: -4 } }
-                            ],
-                            environment: [
-                                // Diverse tree forest creating visual barriers
-                                { type: "tree-oak", position: { x: 6, y: 0, z: -12 }, scale: { x: 1.2, y: 1.2, z: 1.2 } },
-                                { type: "tree-pine", position: { x: -6, y: 0, z: 10 }, scale: { x: 1.5, y: 1.5, z: 1.5 } },
-                                { type: "tree", position: { x: 14, y: 6, z: -14 }, scale: { x: 1.3, y: 1.3, z: 1.3 } },
-                                { type: "tree-palm", position: { x: -10, y: 0, z: -12 }, scale: { x: 1, y: 1, z: 1 } },
-                                
-                                // Rich flora decoration
-                                { type: "flowers", position: { x: 2, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "flower-red", position: { x: -2, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "flower-blue", position: { x: 2, y: 1, z: -2 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "bush", position: { x: -2, y: 1, z: -2 }, scale: { x: 1.2, y: 1.2, z: 1.2 } },
-                                
-                                // Varied rocks and stones
-                                { type: "rock-large", position: { x: -3, y: 1, z: -8 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "rock-small", position: { x: 3, y: 1, z: -8 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "rocks", position: { x: 0, y: 1, z: -10 }, scale: { x: 0.8, y: 0.8, z: 0.8 } },
-                                
-                                // Magical elements
-                                { type: "crystal", position: { x: 16, y: 2, z: 8 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "mushroom-red", position: { x: 6, y: 1, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "mushroom", position: { x: 10, y: 1, z: 6 }, scale: { x: 0.8, y: 0.8, z: 0.8 } },
-                                
-                                // Ground decoration
-                                { type: "grass-patch", position: { x: 12, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "log", position: { x: -6, y: 1, z: 2 }, scale: { x: 1, y: 1, z: 1 } }
-                            ],
-                            interactive: [
-                                { type: "flag-banner", position: { x: 22, y: 19, z: 2 }, action: "level_complete" },
-                                { type: "chest-large", position: { x: 8, y: 15, z: -8 } },
-                                { type: "crate", position: { x: 10, y: 15, z: -6 } },
-                                { type: "torch", position: { x: 6, y: 15, z: -8 } },
-                                { type: "sign", position: { x: 2, y: 1, z: 0 } },
-                                { type: "lantern", position: { x: -8, y: 4, z: 6 } }
-                            ],
-                            structures: [
-                                { type: "fence", position: { x: -6, y: 1, z: 0 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "fence-corner", position: { x: -6, y: 1, z: -2 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "ladder", position: { x: 8, y: 8, z: 0 }, scale: { x: 1, y: 1.5, z: 1 } },
-                                { type: "pillar", position: { x: 26, y: 8, z: 2 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "bridge-stone", position: { x: 6, y: 4, z: 6 }, scale: { x: 1, y: 1, z: 1 } }
-                            ],
-                            decorations: [
-                                { type: "statue", position: { x: 0, y: 1, z: -6 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "fountain", position: { x: 0, y: 1, z: 6 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "campfire", position: { x: -4, y: 1, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "banner", position: { x: 8, y: 8, z: -3 }, scale: { x: 1, y: 1, z: 1 } }
-                            ],
-                            hazards: [
-                                { type: "spike", position: { x: 11, y: 2, z: -2 }, damage: 1 },
-                                { type: "saw-blade", position: { x: 16, y: 10, z: 6 }, damage: 1 },
-                                { type: "spike-ball", position: { x: 13, y: 7, z: -1 }, damage: 1 }
-                            ]
-                        };
-                    case 2:
-                        return {
-                            name: "Industrial Sky City",
-                            spawn: { x: 0, y: 5, z: 0 },
-                            platforms: [
-                                // Industrial starting platform
-                                { type: "metal", position: { x: 0, y: 0, z: 0 }, scale: { x: 4, y: 1, z: 4 } },
-                                
-                                // Lower industrial maze
-                                { type: "metal", position: { x: 8, y: 2, z: 0 }, scale: { x: 3, y: 1, z: 3 } },
-                                { type: "metal", position: { x: 8, y: 2, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
-                                { type: "metal", position: { x: 0, y: 2, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
-                                { type: "metal", position: { x: -8, y: 2, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
-                                { type: "metal", position: { x: -8, y: 2, z: 0 }, scale: { x: 3, y: 1, z: 3 } },
-                                
-                                // Mid-level factory floor
-                                { type: "stone", position: { x: 16, y: 6, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                { type: "stone", position: { x: 16, y: 6, z: -16 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                { type: "stone", position: { x: -16, y: 6, z: -16 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                { type: "stone", position: { x: -16, y: 6, z: 0 }, scale: { x: 2.5, y: 1, z: 2.5 } },
-                                
-                                // Upper industrial towers
-                                { type: "metal", position: { x: 24, y: 12, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
-                                { type: "metal", position: { x: -24, y: 12, z: -8 }, scale: { x: 3, y: 1, z: 3 } },
-                                
-                                // Sky bridges
-                                { type: "bridge", position: { x: 12, y: 9, z: -8 }, scale: { x: 1, y: 0.3, z: 3 } },
-                                { type: "bridge", position: { x: -12, y: 9, z: -8 }, scale: { x: 1, y: 0.3, z: 3 } },
-                                { type: "bridge", position: { x: 0, y: 15, z: -8 }, scale: { x: 4, y: 0.5, z: 2 } },
-                                
-                                // Final sky platform
-                                { type: "stone", position: { x: 0, y: 20, z: -8 }, scale: { x: 4, y: 1, z: 4 } },
-                                
-                                // Moving industrial platforms
-                                { type: "moving", position: { x: 4, y: 4, z: -4 }, scale: { x: 2, y: 0.5, z: 2 }, moving: true, path: [
-                                    { x: 4, y: 4, z: -4 }, { x: -4, y: 4, z: -4 }, { x: 4, y: 4, z: -4 }
-                                ]},
-                                { type: "moving", position: { x: 20, y: 9, z: -8 }, scale: { x: 2, y: 0.5, z: 2 }, moving: true, path: [
-                                    { x: 20, y: 9, z: -8 }, { x: 20, y: 9, z: -16 }, { x: 20, y: 9, z: -8 }
-                                ]}
-                            ],
-                            collectibles: [
-                                // Industrial collectibles
-                                { type: "coin-silver", position: { x: 8, y: 5, z: -4 } },
-                                { type: "coin-gold", position: { x: 0, y: 5, z: -8 } },
-                                { type: "coin-silver", position: { x: -8, y: 5, z: -4 } },
-                                { type: "gem-blue", position: { x: 16, y: 9, z: -8 } },
-                                { type: "gem-red", position: { x: -16, y: 9, z: -8 } },
-                                { type: "key", position: { x: 24, y: 15, z: -8 } },
-                                { type: "key", position: { x: -24, y: 15, z: -8 } },
-                                { type: "star", position: { x: 0, y: 23, z: -8 } },
-                                { type: "power-up", position: { x: 2, y: 3, z: 2 } },
-                                { type: "heart", position: { x: 0, y: 21, z: -6 } }
-                            ],
-                            environment: [
-                                // Industrial structures
-                                { type: "rock-large", position: { x: 5, y: 2, z: 5 } },
-                                { type: "rock-small", position: { x: -5, y: 2, z: 5 } },
-                                { type: "crystal", position: { x: 12, y: 6, z: -12 } },
-                                { type: "crystal", position: { x: -12, y: 6, z: -12 } },
-                                
-                                // Sparse vegetation in industrial setting
-                                { type: "bush", position: { x: 28, y: 12, z: -6 } },
-                                { type: "grass-patch", position: { x: -28, y: 12, z: -10 } }
-                            ],
-                            interactive: [
-                                { type: "flag-banner", position: { x: 0, y: 23, z: -8 }, action: "level_complete" },
-                                { type: "crate-metal", position: { x: 2, y: 21, z: -6 } },
-                                { type: "crate-metal", position: { x: -2, y: 21, z: -6 } },
-                                { type: "barrel", position: { x: 8, y: 3, z: 2 } },
-                                { type: "barrel", position: { x: -8, y: 3, z: 2 } },
-                                { type: "lever", position: { x: 16, y: 7, z: 2 } },
-                                { type: "button-square", position: { x: -16, y: 7, z: 2 } },
-                                { type: "torch", position: { x: 24, y: 13, z: -6 } },
-                                { type: "torch", position: { x: -24, y: 13, z: -6 } }
-                            ],
-                            structures: [
-                                { type: "ladder-long", position: { x: 20, y: 6, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
-                                { type: "ladder-long", position: { x: -20, y: 6, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
-                                { type: "column", position: { x: 4, y: 10, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
-                                { type: "column", position: { x: -4, y: 10, z: -8 }, scale: { x: 1, y: 2, z: 1 } },
-                                { type: "wall", position: { x: 12, y: 4, z: 4 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "wall", position: { x: -12, y: 4, z: 4 }, scale: { x: 1, y: 1, z: 1 } }
-                            ],
-                            decorations: [
-                                { type: "windmill", position: { x: 30, y: 12, z: -8 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "well", position: { x: 0, y: 1, z: 8 }, scale: { x: 1, y: 1, z: 1 } },
-                                { type: "cart", position: { x: 6, y: 1, z: 6 }, scale: { x: 1, y: 1, z: 1 } }
-                            ],
-                            hazards: [
-                                { type: "crusher", position: { x: 4, y: 3, z: -4 }, damage: 1 },
-                                { type: "crusher", position: { x: -4, y: 3, z: -4 }, damage: 1 },
-                                { type: "saw-blade", position: { x: 12, y: 7, z: -8 }, damage: 1 },
-                                { type: "saw-blade", position: { x: -12, y: 7, z: -8 }, damage: 1 },
-                                { type: "fire", position: { x: 8, y: 3, z: -12 }, damage: 1 },
-                                { type: "fire", position: { x: -8, y: 3, z: -12 }, damage: 1 }
-                            ]
-                        };
-                    default:
-                        return this.getEnhancedLevelData(1);
-                }
-            }
-            
-            async createLevelObjects(levelData) {
-                for (const category of ['platforms', 'collectibles', 'environment', 'interactive', 'hazards', 'structures', 'decorations']) {
-                    if (levelData[category]) {
-                        for (const objectData of levelData[category]) {
-                            const object = await this.createObject(category, objectData);
-                            if (object) {
-                                this[category === 'structures' || category === 'decorations' ? 'environment' : category].push(object);
-                                this.scene.add(object);
-                                
-                                // Handle moving platforms
-                                if (objectData.moving && objectData.path) {
-                                    object.userData.moving = true;
-                                    object.userData.path = objectData.path;
-                                    object.userData.pathIndex = 0;
-                                    object.userData.pathDirection = 1;
-                                    this.movingPlatforms.push(object);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            async createObject(category, objectData) {
-                const assetPath = this.assetPaths[category]?.[objectData.type];
-                
-                try {
-                    let object = Utils.cloneModel(assetPath);
-                    
-                    if (!object) {
-                        const loadedModel = await Utils.loadModel(assetPath, this.gltfLoader);
-                        object = loadedModel.clone();
-                    }
-                    
-                    this.applyTransformations(object, objectData);
-                    
-                    if (category === 'collectibles') {
-                        object.userData = {
-                            type: objectData.type,
-                            collected: false,
-                            originalPosition: object.position.clone()
-                        };
-                    } else if (category === 'hazards') {
-                        object.userData = {
-                            type: objectData.type,
-                            damage: objectData.damage || 1
-                        };
-                    } else if (category === 'interactive') {
-                        object.userData = {
-                            type: objectData.type,
-                            action: objectData.action || 'none'
-                        };
-                    }
-                    
-                    return object;
-                    
-                } catch (error) {
-                    console.warn(`Failed to create object: ${category}:${objectData.type}`, error);
-                    // Create a simple fallback as last resort
-                    const fallback = Utils.createBasicCube();
-                    this.applyTransformations(fallback, objectData);
-                    return fallback;
-                }
-            }
-            
-            applyTransformations(object, objectData) {
-                if (objectData.position) {
-                    object.position.set(
-                        objectData.position.x || 0,
-                        objectData.position.y || 0,
-                        objectData.position.z || 0
-                    );
-                }
-                
-                if (objectData.rotation) {
-                    object.rotation.set(
-                        Utils.degToRad(objectData.rotation.x || 0),
-                        Utils.degToRad(objectData.rotation.y || 0),
-                        Utils.degToRad(objectData.rotation.z || 0)
-                    );
-                }
-                
-                if (objectData.scale) {
-                    object.scale.set(
-                        objectData.scale.x || 1,
-                        objectData.scale.y || 1,
-                        objectData.scale.z || 1
-                    );
-                }
-            }
-            
-            update() {
-                // Animate collectibles
-                this.collectibles.forEach(collectible => {
-                    if (!collectible.userData.collected) {
-                        Utils.animateRotate(collectible, 0, 0.02, 0);
-                        Utils.animateFloat(collectible, 0.005, 0.1);
-                    }
-                });
-                
-                // Animate hazards
-                this.hazards.forEach(hazard => {
-                    if (hazard.userData.type === 'saw') {
-                        Utils.animateRotate(hazard, 0, 0, 0.1);
-                    }
-                });
-                
-                // Update moving platforms
-                this.movingPlatforms.forEach(platform => {
-                    this.updateMovingPlatform(platform);
-                });
-            }
-            
-            updateMovingPlatform(platform) {
-                const userData = platform.userData;
-                if (!userData.moving || !userData.path) return;
-                
-                const path = userData.path;
-                const speed = 0.02;
-                
-                const currentTarget = path[userData.pathIndex];
-                const targetPos = new THREE.Vector3(currentTarget.x, currentTarget.y, currentTarget.z);
-                
-                platform.position.lerp(targetPos, speed);
-                
-                // Check if reached target
-                if (platform.position.distanceTo(targetPos) < 0.1) {
-                    userData.pathIndex += userData.pathDirection;
-                    
-                    // Reverse direction at path ends
-                    if (userData.pathIndex >= path.length - 1 || userData.pathIndex <= 0) {
-                        userData.pathDirection *= -1;
-                        userData.pathIndex = Utils.clamp(userData.pathIndex, 0, path.length - 1);
-                    }
-                }
-            }
-            
             clearLevel() {
-                [...this.platforms, ...this.collectibles, ...this.hazards, 
-                 ...this.environment, ...this.interactive].forEach(obj => {
-                    this.scene.remove(obj);
-                });
-                
+                [...this.platforms, ...this.collectibles, ...this.hazards, ...this.environment, ...this.interactive].forEach(obj => this.scene.remove(obj));
                 this.platforms = [];
                 this.collectibles = [];
                 this.hazards = [];
                 this.environment = [];
                 this.interactive = [];
-                this.movingPlatforms = [];
                 this.totalCoins = 0;
+                this.unlockedDoors = [];
             }
-            
+            async createPlatforms() {
+                if (!this.levelData.platforms) return;
+                for (const platformData of this.levelData.platforms) {
+                    const platform = await this.createObject('platforms', platformData);
+                    if (platform) {
+                        this.platforms.push(platform);
+                        this.scene.add(platform);
+                    }
+                }
+            }
+            async createCollectibles() {
+                if (!this.levelData.collectibles) return;
+                for (const collectibleData of this.levelData.collectibles) {
+                    const collectible = await this.createObject('collectibles', collectibleData);
+                    if (collectible) {
+                        collectible.userData = { type: collectibleData.type, collected: false, originalPosition: collectible.position.clone() };
+                        this.collectibles.push(collectible);
+                        this.scene.add(collectible);
+                    }
+                }
+            }
+            async createHazards() {
+                if (!this.levelData.hazards) return;
+                for (const hazardData of this.levelData.hazards) {
+                    const hazard = await this.createObject('hazards', hazardData);
+                    if (hazard) {
+                        hazard.userData = { type: hazardData.type, damage: hazardData.damage || 1 };
+                        this.hazards.push(hazard);
+                        this.scene.add(hazard);
+                    }
+                }
+            }
+            async createEnvironment() {
+                if (!this.levelData.environment) return;
+                for (const envData of this.levelData.environment) {
+                    const envObject = await this.createObject('environment', envData);
+                    if (envObject) {
+                        envObject.userData = { type: envData.type };
+                        this.environment.push(envObject);
+                        this.scene.add(envObject);
+                    }
+                }
+            }
+            async createInteractive() {
+                if (!this.levelData.interactive) return;
+                for (const interactiveData of this.levelData.interactive) {
+                    const interactive = await this.createObject('interactive', interactiveData);
+                    if (interactive) {
+                        interactive.userData = { type: interactiveData.type, action: interactiveData.action || 'none', locked: interactiveData.userData?.locked || false, activated: false, opened: false };
+                        this.interactive.push(interactive);
+                        this.scene.add(interactive);
+                    }
+                }
+            }
+            async createObject(category, objectData) {
+                const assetPath = this.assetPaths[category][objectData.type];
+                if (!assetPath) {
+                    console.warn(`Asset path not found for ${category}:${objectData.type}`);
+                    return this.createFallbackObject(objectData);
+                }
+                try {
+                    let object = Utils.cloneModel(assetPath);
+                    if (!object) {
+                        const loadedModel = await Utils.loadModel(assetPath, this.gltfLoader);
+                        object = loadedModel.clone();
+                    }
+                    this.applyTransformations(object, objectData);
+                    return object;
+                } catch (error) {
+                    console.warn(`Failed to load ${assetPath}, using fallback`);
+                    return this.createFallbackObject(objectData);
+                }
+            }
+            createFallbackObject(objectData) {
+                const size = objectData.scale ? [objectData.scale.x || 1, objectData.scale.y || 1, objectData.scale.z || 1] : [1, 1, 1];
+                const color = this.getFallbackColor(objectData.type);
+                const geometry = this.getFallbackGeometry(objectData.type);
+                const object = Utils.createFallbackGeometry(geometry, color, size);
+                this.applyTransformations(object, objectData);
+                return object;
+            }
+            getFallbackColor(type) {
+                const colorMap = {
+                    'grass': 0x4CAF50, 'platform': 0x9E9E9E, 'terrain-dirt': 0x4CAF50, 'terrain-rock': 0xD3D3D3,
+                    'coin-gold': 0xFFD700, 'coin-silver': 0xC0C0C0, 'coin-bronze': 0xCD7F32, 'heart': 0xFF69B4, 'jewel': 0x9C27B0, 'key': 0xFFC107,
+                    'spike': 0xFF5722, 'saw': 0xF44336, 'trap': 0xFF1744, 'bomb': 0x000000,
+                    'tree': 0x2E7D32, 'rocks': 0x5D4037, 'grass': 0x4CAF50, 'flowers': 0xE91E63, 'hedge': 0x4CAF50, 'mushroom': 0xF4A460
+                };
+                return colorMap[type] || 0x808080;
+            }
+            getFallbackGeometry(type) {
+                const geometryMap = { 'heart': 'sphere', 'coin-gold': 'cylinder', 'coin-silver': 'cylinder', 'coin-bronze': 'cylinder', 'tree': 'cylinder', 'saw': 'cylinder' };
+                return geometryMap[type] || 'box';
+            }
+            applyTransformations(object, objectData) {
+                if (objectData.position) object.position.set(objectData.position.x || 0, objectData.position.y || 0, objectData.position.z || 0);
+                if (objectData.rotation) object.rotation.set(Utils.degToRad(objectData.rotation.x || 0), Utils.degToRad(objectData.rotation.y || 0), Utils.degToRad(objectData.rotation.z || 0));
+                if (objectData.scale) object.scale.set(objectData.scale.x || 1, objectData.scale.y || 1, objectData.scale.z || 1);
+            }
             countTotalCoins() {
-                this.totalCoins = this.collectibles.filter(item => 
-                    item.userData.type && item.userData.type.includes('coin')
-                ).length;
-                
+                this.totalCoins = this.collectibles.filter(item => item.userData.type && item.userData.type.includes('coin')).length;
                 Utils.updateUI('totalCoins', this.totalCoins);
             }
-            
+            update() {
+                this.collectibles.forEach(collectible => {
+                    if (!collectible.userData.collected) {
+                        Utils.animateRotate(collectible, 0, 0.02, 0);
+                        Utils.animateFloat(collectible, 0.005, 0.02);
+                    }
+                });
+                this.hazards.forEach(hazard => {
+                    if (hazard.userData.type === 'saw') Utils.animateRotate(hazard, 0, 0, 0.1);
+                });
+                this.environment.forEach(envObj => {
+                    if (envObj.userData && (envObj.userData.type === 'tree' || envObj.userData.type === 'grass' || envObj.userData.type === 'hedge')) {
+                        envObj.rotation.z = Math.sin(Date.now() * 0.001) * 0.02;
+                    }
+                });
+            }
             getPlayerSpawnPosition() {
+                if (this.levelData && this.levelData.spawn) {
+                    return new THREE.Vector3(this.levelData.spawn.x || 0, this.levelData.spawn.y || 5, this.levelData.spawn.z || 0);
+                }
                 return new THREE.Vector3(0, 5, 0);
             }
-            
-            checkLevelComplete() {
-                const collectedCoins = this.collectibles.filter(item => 
-                    item.userData.type && 
-                    item.userData.type.includes('coin') && 
-                    item.userData.collected
-                ).length;
-                return collectedCoins >= this.totalCoins;
+            getLevelGoal() {
+                if (this.levelData && this.levelData.goal) return this.levelData.goal;
+                return { type: 'collect_all_coins' };
             }
-            
+            checkLevelComplete() {
+                const goal = this.getLevelGoal();
+                switch (goal.type) {
+                    case 'collect_all_coins':
+                        const collectedCoins = this.collectibles.filter(item => item.userData.type && item.userData.type.includes('coin') && item.userData.collected).length;
+                        return collectedCoins >= this.totalCoins;
+                    case 'reach_flag':
+                        const flag = this.interactive.find(obj => obj.userData.type === 'flag');
+                        if (flag && game.player) return Utils.distance(game.player.position, flag.position) < 3;
+                        return false;
+                    case 'collect_keys':
+                        return game.player.keysCollected >= (goal.count || 1);
+                    default:
+                        return false;
+                }
+            }
             resetCollectibles() {
                 this.collectibles.forEach(collectible => {
                     collectible.userData.collected = false;
@@ -1801,34 +816,37 @@
                     collectible.position.copy(collectible.userData.originalPosition);
                 });
             }
-            
-            getPlatforms() {
-                return [...this.platforms, ...this.movingPlatforms];
+            unlockDoor() {
+                const door = this.interactive.find(obj => obj.userData.type === 'door' && obj.userData.locked);
+                if (door && game.player.keysCollected > 0) {
+                    door.userData.locked = false;
+                    door.rotation.y = Utils.degToRad(90);
+                    this.unlockedDoors.push(door);
+                    game.player.keysCollected--;
+                    Utils.updateUI('keys', game.player.keysCollected);
+                }
             }
-            
-            getCollectibles() {
-                return this.collectibles;
-            }
-            
-            getHazards() {
-                return this.hazards;
+            getPlatforms() { return this.platforms; }
+            getCollectibles() { return this.collectibles; }
+            getHazards() { return this.hazards; }
+            getInteractive() { return this.interactive; }
+            getLevelInfo() {
+                return { number: this.currentLevel, totalCoins: this.totalCoins, platforms: this.platforms.length, hazards: this.hazards.length, goal: this.getLevelGoal() };
             }
         }
 
-        // Main Game class
+        // Game Class
         class Game {
             constructor() {
                 this.scene = null;
                 this.camera = null;
                 this.renderer = null;
-                this.cameraController = null;
-                
                 this.loadingManager = null;
                 this.gltfLoader = null;
-                
                 this.player = null;
                 this.level = null;
-                
+                this.audioListener = null;
+                this.backgroundMusic = null;
                 this.gameState = {
                     isPlaying: false,
                     isPaused: false,
@@ -1836,51 +854,81 @@
                     currentLevel: 1,
                     score: 0,
                     coins: 0,
-                    lives: 3
+                    lives: 3,
+                    assetsLoaded: 0,
+                    totalAssets: 0
                 };
-                
+                this.requiredAssets = [
+                    'assets/models/platforms/block-grass.glb',
+                    'assets/models/platforms/block-grass-large.glb',
+                    'assets/models/platforms/block-grass-corner.glb',
+                    'assets/models/platforms/block-grass-curve.glb',
+                    'assets/models/platforms/platform.glb',
+                    'assets/models/platforms/platform-ramp.glb',
+                    'assets/models/platforms/block-snow-large.glb',
+                    'assets/models/collectibles/coin-gold.glb',
+                    'assets/models/collectibles/coin-silver.glb',
+                    'assets/models/collectibles/coin-bronze.glb',
+                    'assets/models/collectibles/heart.glb',
+                    'assets/models/collectibles/jewel.glb',
+                    'assets/models/collectibles/key.glb',
+                    'assets/models/environment/tree.glb',
+                    'assets/models/environment/tree-pine.glb',
+                    'assets/models/environment/rocks.glb',
+                    'assets/models/environment/grass.glb',
+                    'assets/models/environment/flowers.glb',
+                    'assets/models/environment/hedge.glb',
+                    'assets/models/environment/mushrooms.glb',
+                    'assets/models/interactive/crate.glb',
+                    'assets/models/interactive/chest.glb',
+                    'assets/models/interactive/button-round.glb',
+                    'assets/models/interactive/door-rotate.glb',
+                    'assets/models/interactive/lever.glb',
+                    'assets/models/interactive/flag.glb',
+                    'assets/models/interactive/button-square.glb',
+                    'assets/models/hazards/spike-block.glb',
+                    'assets/models/hazards/saw.glb',
+                    'assets/models/hazards/trap-spikes.glb',
+                    'assets/models/hazards/bomb.glb',
+                    'assets/models/structures/fence-low-straight.glb',
+                    'assets/models/structures/ladder.glb',
+                    'assets/models/structures/poles.glb',
+                    'assets/models/structures/platform-fortified.glb'
+                ];
                 this.animationId = null;
             }
-            
             async init() {
-                console.log('Initializing Enhanced 3D Platformer...');
-                
+                console.log('Initializing 3D Exploration Game...');
                 try {
                     this.setupScene();
                     this.setupCamera();
                     this.setupRenderer();
                     this.setupLighting();
+                    this.setupAudio();
                     this.setupLoading();
-                    
                     await this.loadAssets();
-                    
                     this.player = new Player(this.scene);
                     this.level = new Level(this.scene, this.gltfLoader);
-                    this.cameraController = new CameraController(this.camera, this.player);
-                    
+                    this.player.setupAudio(this.audioListener);
                     this.setupInput();
                     this.setupUI();
-                    
                     await this.loadLevel(1);
                     this.startGame();
-                    
+                    this.playBackgroundMusic();
                 } catch (error) {
                     console.error('Failed to initialize game:', error);
                     this.showError('Failed to load game. Please refresh and try again.');
                 }
             }
-            
             setupScene() {
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x87CEEB);
                 this.scene.fog = new THREE.Fog(0x87CEEB, 50, 200);
             }
-            
             setupCamera() {
                 this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
                 this.camera.position.set(0, 10, 15);
             }
-            
             setupRenderer() {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1888,18 +936,14 @@
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 this.renderer.setClearColor(0x87CEEB);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                
                 document.getElementById('gameContainer').appendChild(this.renderer.domElement);
             }
-            
             setupLighting() {
                 const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
                 this.scene.add(ambientLight);
-                
                 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
                 directionalLight.position.set(50, 50, 50);
                 directionalLight.castShadow = true;
-                
                 directionalLight.shadow.mapSize.width = 2048;
                 directionalLight.shadow.mapSize.height = 2048;
                 directionalLight.shadow.camera.near = 0.5;
@@ -1908,159 +952,119 @@
                 directionalLight.shadow.camera.right = 50;
                 directionalLight.shadow.camera.top = 50;
                 directionalLight.shadow.camera.bottom = -50;
-                
                 this.scene.add(directionalLight);
-                
                 const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.3);
                 fillLight.position.set(-30, 20, -30);
                 this.scene.add(fillLight);
             }
-            
+            setupAudio() {
+                this.audioListener = new THREE.AudioListener();
+                this.camera.add(this.audioListener);
+                this.backgroundMusic = new THREE.Audio(this.audioListener);
+                new THREE.AudioLoader().load('assets/audio/music.mp3', (buffer) => {
+                    this.backgroundMusic.setBuffer(buffer);
+                    this.backgroundMusic.setLoop(true);
+                    this.backgroundMusic.setVolume(0.3);
+                });
+            }
+            playBackgroundMusic() {
+                if (this.backgroundMusic && !this.backgroundMusic.isPlaying) {
+                    this.backgroundMusic.play();
+                }
+            }
             setupLoading() {
                 this.loadingManager = new THREE.LoadingManager();
-                
-                // Check if GLTFLoader is available
-                if (typeof THREE.GLTFLoader !== 'undefined') {
-                    this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
-                    console.log('GLTFLoader initialized successfully');
-                } else {
-                    console.warn('GLTFLoader not available, using fallback geometry only');
-                    this.gltfLoader = null;
-                }
-                
+                this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
+                this.gameState.totalAssets = this.requiredAssets.length;
                 this.loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
                     const progress = (itemsLoaded / itemsTotal) * 100;
                     Utils.updateLoadingProgress(progress);
                 };
-                
                 this.loadingManager.onLoad = () => {
+                    console.log('All assets loaded');
                     this.gameState.isLoading = false;
                 };
+                this.loadingManager.onError = (url) => console.warn(`Failed to load: ${url}`);
             }
-            
             async loadAssets() {
-                // Enhanced asset loading simulation with more realistic timing
-                const steps = [
-                    { progress: 10, message: 'Loading platform models...' },
-                    { progress: 25, message: 'Loading collectibles...' },
-                    { progress: 40, message: 'Loading environment assets...' },
-                    { progress: 55, message: 'Loading interactive objects...' },
-                    { progress: 70, message: 'Loading hazards and effects...' },
-                    { progress: 85, message: 'Loading structures and decorations...' },
-                    { progress: 100, message: 'Finalizing enhanced experience...' }
-                ];
-                
-                for (const step of steps) {
-                    Utils.updateLoadingProgress(step.progress);
-                    document.querySelector('.loading-text').textContent = step.message;
-                    await new Promise(resolve => setTimeout(resolve, 150));
-                }
-                
-                console.log('Enhanced assets with expanded Kenney collection loaded');
+                console.log(`Loading ${this.requiredAssets.length} assets...`);
+                const loadPromises = this.requiredAssets.map(assetPath => {
+                    return Utils.loadModel(assetPath, this.gltfLoader).catch(error => {
+                        console.warn(`Asset load failed: ${assetPath}`, error);
+                        return null;
+                    });
+                });
+                await Promise.allSettled(loadPromises);
+                console.log('Asset loading complete');
             }
-            
             setupInput() {
                 document.addEventListener('keydown', (event) => {
                     switch(event.code) {
-                        case 'KeyR':
-                            this.restartLevel();
-                            break;
-                        case 'KeyN':
-                            this.nextLevel();
-                            break;
-                        case 'KeyP':
-                        case 'Escape':
-                            this.togglePause();
-                            break;
+                        case 'KeyR': this.restartLevel(); break;
+                        case 'KeyN': this.nextLevel(); break;
+                        case 'KeyP': case 'Escape': this.togglePause(); break;
+                        case 'KeyM': this.toggleMusic(); break;
                     }
                 });
-                
                 window.addEventListener('resize', () => this.onWindowResize());
+                document.addEventListener('contextmenu', (event) => event.preventDefault());
             }
-            
             setupUI() {
                 this.updateUI();
                 Utils.showGameUI();
             }
-            
             async loadLevel(levelNumber) {
-                console.log(`Loading enhanced level ${levelNumber}...`);
-                
+                console.log(`Loading level ${levelNumber}...`);
                 try {
                     const success = await this.level.loadLevel(levelNumber);
-                    
                     if (success) {
                         this.gameState.currentLevel = levelNumber;
-                        
                         const spawnPos = this.level.getPlayerSpawnPosition();
                         this.player.reset(spawnPos);
-                        
                         this.gameState.coins = 0;
                         this.updateUI();
-                        
-                        console.log(`Enhanced Level ${levelNumber} loaded successfully`);
+                        console.log(`Level ${levelNumber} loaded successfully`);
                         return true;
                     } else {
                         throw new Error(`Failed to load level ${levelNumber}`);
                     }
-                    
                 } catch (error) {
                     console.error(`Error loading level ${levelNumber}:`, error);
                     this.showError(`Failed to load level ${levelNumber}`);
                     return false;
                 }
             }
-            
             startGame() {
                 this.gameState.isPlaying = true;
                 this.gameState.isPaused = false;
                 this.animate();
-                console.log('Enhanced 3D Platformer started!');
+                console.log('Game started!');
             }
-            
             animate() {
                 if (!this.gameState.isPlaying) return;
-                
                 this.animationId = requestAnimationFrame(() => this.animate());
-                
                 if (!this.gameState.isPaused) {
                     this.update();
                     this.render();
                 }
             }
-            
             update() {
                 if (!this.player || !this.level) return;
-                
-                this.player.update(
-                    this.level.getPlatforms(),
-                    this.level.getCollectibles(),
-                    this.level.getHazards()
-                );
-                
-                this.cameraController.update();
+                this.player.update(this.level.getPlatforms(), this.level.getCollectibles(), this.level.getHazards(), this.level.getInteractive());
+                this.player.updateCamera(this.camera);
                 this.level.update();
-                
-                if (this.level.checkLevelComplete()) {
-                    this.levelComplete();
-                }
-                
+                if (this.level.checkLevelComplete()) this.levelComplete();
                 this.updateUI();
             }
-            
             render() {
                 this.renderer.render(this.scene, this.camera);
             }
-            
             levelComplete() {
                 const nextLevel = this.gameState.currentLevel + 1;
-                const currentLevelName = this.level.currentLevel === 1 ? "Enchanted Garden Towers" : "Industrial Sky City";
-                
-                if (nextLevel <= 2) {
-                    const nextLevelName = nextLevel === 2 ? "Industrial Sky City" : "Unknown";
+                if (nextLevel <= 3) {
                     Utils.showMessage(
                         'Level Complete!',
-                        `Excellent work navigating ${currentLevelName}! Ready to explore ${nextLevelName}?`,
+                        `Great job! Ready for level ${nextLevel}?`,
                         'Next Level',
                         () => {
                             Utils.hideMessage();
@@ -2069,8 +1073,8 @@
                     );
                 } else {
                     Utils.showMessage(
-                        'Enhanced Demo Complete!',
-                        `Congratulations! You've mastered both levels of the enhanced 3D platformer!\n\n✨ Enchanted Garden Towers - Complete!\n🏭 Industrial Sky City - Complete!\n\nFinal Score: ${this.gameState.score}\n\nThis showcases advanced camera controls, rich 3D level design, and expanded Kenney asset integration!`,
+                        'Game Complete!',
+                        `Congratulations! You've completed all levels!\nFinal Score: ${this.gameState.score}`,
                         'Play Again',
                         () => {
                             Utils.hideMessage();
@@ -2080,7 +1084,6 @@
                     );
                 }
             }
-            
             playerDied() {
                 if (this.gameState.lives <= 0) {
                     Utils.showMessage(
@@ -2096,100 +1099,80 @@
                     this.restartLevel();
                 }
             }
-            
             restartLevel() {
                 console.log('Restarting level...');
-                
                 const spawnPos = this.level.getPlayerSpawnPosition();
                 this.player.reset(spawnPos);
                 this.player.lives = this.gameState.lives;
-                
                 this.level.resetCollectibles();
                 this.gameState.coins = 0;
                 this.updateUI();
             }
-            
             restartGame() {
                 this.gameState.score = 0;
                 this.gameState.coins = 0;
                 this.gameState.lives = 3;
                 this.gameState.currentLevel = 1;
-                
                 this.player.lives = 3;
                 this.player.isAlive = true;
-                
                 this.loadLevel(1);
             }
-            
             nextLevel() {
                 const nextLevel = this.gameState.currentLevel + 1;
-                if (nextLevel <= 2) {
-                    this.loadLevel(nextLevel);
-                }
+                if (nextLevel <= 3) this.loadLevel(nextLevel);
             }
-            
             togglePause() {
                 this.gameState.isPaused = !this.gameState.isPaused;
                 Utils.togglePauseMenu(this.gameState.isPaused);
+                console.log(this.gameState.isPaused ? 'Game paused' : 'Game resumed');
             }
-            
             resumeGame() {
                 this.gameState.isPaused = false;
                 Utils.togglePauseMenu(false);
             }
-            
             addScore(points) {
                 this.gameState.score += points;
             }
-            
             addCoin() {
                 this.gameState.coins++;
             }
-            
+            unlockDoor() {
+                this.level.unlockDoor();
+            }
             updateUI() {
                 Utils.updateUI('score', this.gameState.score);
                 Utils.updateUI('lives', this.player ? this.player.lives : this.gameState.lives);
                 Utils.updateUI('coins', this.gameState.coins);
                 Utils.updateUI('currentLevel', this.gameState.currentLevel);
             }
-            
             onWindowResize() {
                 this.camera.aspect = window.innerWidth / window.innerHeight;
                 this.camera.updateProjectionMatrix();
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
             }
-            
             showError(message) {
                 Utils.showMessage('Error', message, 'OK', () => Utils.hideMessage());
             }
-            
-            hideMessage() {
-                Utils.hideMessage();
+            toggleMusic() {
+                if (this.backgroundMusic) {
+                    if (this.backgroundMusic.isPlaying) {
+                        this.backgroundMusic.pause();
+                    } else {
+                        this.backgroundMusic.play();
+                    }
+                }
+            }
+            destroy() {
+                if (this.animationId) cancelAnimationFrame(this.animationId);
+                if (this.renderer) this.renderer.dispose();
+                document.removeEventListener('keydown', this.handleKeyDown);
+                window.removeEventListener('resize', this.onWindowResize);
             }
         }
 
         // Initialize game
         const game = new Game();
-        
-        window.addEventListener('load', () => {
-            // Debug check to ensure GLTFLoader is available
-            console.log('THREE object:', THREE);
-            console.log('GLTFLoader available:', typeof THREE.GLTFLoader);
-            
-            if (typeof THREE.GLTFLoader === 'undefined') {
-                console.error('GLTFLoader not available! Check script loading.');
-                document.getElementById('loading').innerHTML = `
-                    <div class="loading-content">
-                        <h1>Loading Error</h1>
-                        <p>GLTFLoader failed to load. Game will use fallback geometry only.</p>
-                        <button onclick="game.init()" style="margin-top: 20px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Start Game Anyway</button>
-                    </div>
-                `;
-                return;
-            }
-            
-            game.init();
-        });
+        game.init();
     </script>
 </body>
 </html>
