@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced 3D Exploration Game</title>
+    <title>Canyon of Secrets - 3D Exploration Game</title>
     <style>
         body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
         canvas { display: block; }
@@ -24,8 +24,8 @@
 </head>
 <body>
     <div id="loading">
-        <h1>Enhanced 3D Exploration Game</h1>
-        <p>Loading Enhanced Assets...</p>
+        <h1>Canyon of Secrets</h1>
+        <p>Loading Exploration Assets...</p>
         <div id="loadingBar"><div id="loadingFill"></div></div>
         <span id="loadingPercent">0%</span>
     </div>
@@ -34,12 +34,12 @@
         <div>Score: <span id="score">0</span></div>
         <div>Lives: <span id="lives">3</span></div>
         <div>Coins: <span id="coins">0</span>/<span id="totalCoins">0</span></div>
-        <div>Keys: <span id="keys">0</span></div>
-        <div>Level: <span id="currentLevel">1</span></div>
+        <div>Keys: <span id="keys">0</span>/3</div>
+        <div>Level: <span id="currentLevel">Canyon of Secrets</span></div>
     </div>
 
     <div id="cameraControls" class="hidden">
-        <h3>Enhanced Camera</h3>
+        <h3>Camera Controls</h3>
         <p>Mouse Drag: Orbit Camera</p>
         <p>Scroll Wheel: Zoom</p>
         <p>C: Toggle Camera Mode</p>
@@ -51,25 +51,26 @@
         <p>WASD: Move</p>
         <p>Space: Jump</p>
         <p>Shift: Sprint</p>
-        <p>E: Interact</p>
-        <p>L: Climb Ladder</p>
+        <p>E: Interact (Levers, Buttons, Chests)</p>
+        <p>L: Climb Ladders</p>
         <p>R: Restart Level</p>
         <p>ESC: Pause</p>
+        <p>M: Toggle Music</p>
     </div>
 
     <div id="cameraMode">Camera Mode: Free Orbit</div>
 
     <div id="gameMessage" class="hidden">
         <h1 id="messageTitle">Level Complete!</h1>
-        <p id="messageText">Great job! Moving to next level...</p>
-        <button id="messageButton">Continue</button>
+        <p id="messageText">Great job! You conquered the Canyon of Secrets!</p>
+        <button id="messageButton">Play Again</button>
     </div>
 
     <div id="pauseMenu" class="hidden">
         <h1>Game Paused</h1>
         <button onclick="game.resumeGame()">Resume</button>
         <button onclick="game.restartLevel()">Restart Level</button>
-        <button onclick="game.restartGame()">Back to Level 1</button>
+        <button onclick="game.restartGame()">Back to Start</button>
     </div>
 
     <div id="gameContainer"></div>
@@ -125,13 +126,13 @@
             },
             distance(pos1, pos2) { return pos1.distanceTo(pos2); },
             isColliding(obj1, obj2, threshold = 2) { return this.distance(obj1.position, obj2.position) < threshold; },
-            isOnPlatform(player, platform, threshold = 3) {
+            isOnPlatform(player, platform, threshold = 4) {
                 const horizontalDistance = Math.sqrt(
                     Math.pow(player.position.x - platform.position.x, 2) +
                     Math.pow(player.position.z - platform.position.z, 2)
                 );
                 const verticalDistance = player.position.y - platform.position.y;
-                return horizontalDistance < threshold && verticalDistance > 0.5 && verticalDistance < 3;
+                return horizontalDistance < threshold && verticalDistance > 0.5 && verticalDistance < 4;
             },
             lerp(start, end, factor) { return start + (end - start) * factor; },
             clamp(value, min, max) { return Math.max(min, Math.min(max, value)); },
@@ -147,6 +148,10 @@
                 object.rotation.x += speedX;
                 object.rotation.y += speedY;
                 object.rotation.z += speedZ;
+            },
+            animateMovingPlatform(platform, startPos, endPos, speed = 0.02) {
+                const t = (Math.sin(Date.now() * speed) + 1) / 2;
+                platform.position.lerpVectors(startPos, endPos, t);
             },
             updateUI(id, value) {
                 const element = document.getElementById(id);
@@ -182,7 +187,7 @@
             },
             createParticleEffect(scene, position, color = 0xFFD700) {
                 const particles = [];
-                const particleCount = 10;
+                const particleCount = 15;
                 for (let i = 0; i < particleCount; i++) {
                     const particle = new THREE.Mesh(
                         new THREE.SphereGeometry(0.05, 8, 8),
@@ -190,11 +195,11 @@
                     );
                     particle.position.copy(position);
                     particle.velocity = new THREE.Vector3(
-                        (Math.random() - 0.5) * 0.2,
-                        Math.random() * 0.2,
-                        (Math.random() - 0.5) * 0.2
+                        (Math.random() - 0.5) * 0.3,
+                        Math.random() * 0.3,
+                        (Math.random() - 0.5) * 0.3
                     );
-                    particle.life = 1.0;
+                    particle.life = 1.5;
                     particles.push(particle);
                     scene.add(particle);
                 }
@@ -223,9 +228,9 @@
                 this.velocity = new THREE.Vector3(0, 0, 0);
                 this.position = new THREE.Vector3(0, 5, 0);
                 this.rotation = 0;
-                this.speed = 0.15;
-                this.jumpForce = 0.4;
-                this.gravity = -0.02;
+                this.speed = 0.2;
+                this.jumpForce = 0.5;
+                this.gravity = -0.025;
                 this.isGrounded = false;
                 this.isJumping = false;
                 this.isClimbing = false;
@@ -313,7 +318,7 @@
                 if (this.cameraMode === 'orbit') {
                     this.orbitControls.theta = -Math.PI / 2;
                     this.orbitControls.phi = Math.PI / 4;
-                    this.orbitControls.distance = 12;
+                    this.orbitControls.distance = 15;
                 }
             }
             update(platforms = [], collectibles = [], hazards = [], interactive = []) {
@@ -342,10 +347,10 @@
                     if (this.jumpSound) this.jumpSound.play();
                 }
                 if (this.isClimbing && this.keys.climb) {
-                    this.velocity.y = 0.1;
+                    this.velocity.y = 0.15;
                     this.gravity = 0;
                 } else {
-                    this.gravity = -0.02;
+                    this.gravity = -0.025;
                 }
                 const maxSpeed = currentSpeed * 1.2;
                 this.velocity.x = Utils.clamp(this.velocity.x, -maxSpeed, maxSpeed);
@@ -401,14 +406,16 @@
                             this.isClimbing = true;
                             this.position.x = obj.position.x;
                             this.position.z = obj.position.z;
-                        } else if (obj.userData.type === 'lever' && this.keys.interact && !obj.userData.activated) {
+                        } else if ((obj.userData.type === 'lever' || obj.userData.type === 'button') && this.keys.interact && !obj.userData.activated) {
                             obj.userData.activated = true;
                             obj.rotation.z = Utils.degToRad(45);
                             game.unlockDoor();
+                            game.activatePlatform(obj.userData.platformId);
+                            Utils.createParticleEffect(this.scene, obj.position.clone(), 0x00FF00);
                         } else if (obj.userData.type === 'chest' && this.keys.interact && !obj.userData.opened) {
                             obj.userData.opened = true;
                             obj.position.y += 0.5;
-                            game.addScore(200);
+                            game.addScore(300);
                             Utils.createParticleEffect(this.scene, obj.position.clone(), 0xFFD700);
                         }
                     } else if (obj.userData.type === 'ladder') {
@@ -428,7 +435,7 @@
                     case 'coin-bronze': game.addScore(25); game.addCoin(); break;
                     case 'heart': this.addLife(); game.addScore(200); break;
                     case 'jewel': game.addScore(500); break;
-                    case 'key': this.keysCollected++; game.addScore(300); Utils.updateUI('keys', this.keysCollected); break;
+                    case 'key': this.keysCollected++; game.addScore(400); Utils.updateUI('keys', this.keysCollected); break;
                     default: game.addScore(50); game.addCoin(); break;
                 }
             }
@@ -437,7 +444,7 @@
                 this.lives--;
                 Utils.updateUI('lives', this.lives);
                 Utils.createParticleEffect(this.scene, this.position.clone(), 0xFF0000);
-                this.velocity.y = 0.2;
+                this.velocity.y = 0.3;
                 this.velocity.x *= -2;
                 this.velocity.z *= -2;
                 if (this.lives <= 0) this.die();
@@ -447,7 +454,7 @@
                 }
             }
             addLife() {
-                this.lives++;
+                this.lives = Math.min(this.lives + 1, 5);
                 Utils.updateUI('lives', this.lives);
             }
             die() {
@@ -457,11 +464,11 @@
                 setTimeout(() => { game.playerDied(); }, 1000);
             }
             checkBoundaries() {
-                if (this.position.y < -20) {
+                if (this.position.y < -30) {
                     this.takeDamage();
                     this.respawn();
                 }
-                const maxDistance = 200;
+                const maxDistance = 100;
                 this.position.x = Utils.clamp(this.position.x, -maxDistance, maxDistance);
                 this.position.z = Utils.clamp(this.position.z, -maxDistance, maxDistance);
             }
@@ -490,8 +497,8 @@
                 if (this.cameraMode === 'follow') {
                     const idealCameraPosition = new THREE.Vector3(
                         this.position.x,
-                        this.position.y + 8,
-                        this.position.z + 12
+                        this.position.y + 10,
+                        this.position.z + 15
                     );
                     camera.position.lerp(idealCameraPosition, 0.05);
                     const lookAtPosition = new THREE.Vector3(
@@ -524,7 +531,7 @@
                     this.mesh.material.opacity = 0.9;
                     this.mesh.position.copy(this.position);
                 }
-                this.orbitControls = { theta: -Math.PI / 2, phi: Math.PI / 4, distance: 12 };
+                this.orbitControls = { theta: -Math.PI / 2, phi: Math.PI / 4, distance: 15 };
             }
             setupAudio(listener) {
                 this.jumpSound = new THREE.Audio(listener);
@@ -554,6 +561,7 @@
                 this.levelData = null;
                 this.totalCoins = 0;
                 this.unlockedDoors = [];
+                this.movingPlatforms = [];
                 this.assetPaths = {
                     platforms: {
                         'grass': 'assets/models/platforms/block-grass.glb',
@@ -562,8 +570,9 @@
                         'grass-curve': 'assets/models/platforms/block-grass-curve.glb',
                         'platform': 'assets/models/platforms/platform.glb',
                         'platform-ramp': 'assets/models/platforms/platform-ramp.glb',
-                        'terrain-dirt': 'assets/models/platforms/block-grass-large.glb', // Replaced terrain-dirt
-                        'terrain-rock': 'assets/models/platforms/block-snow-large.glb' // Replaced terrain-rock
+                        'terrain-dirt': 'assets/models/platforms/block-grass-large.glb',
+                        'terrain-rock': 'assets/models/platforms/block-snow-large.glb',
+                        'moving-platform': 'assets/models/platforms/block-moving.glb'
                     },
                     collectibles: {
                         'coin-gold': 'assets/models/collectibles/coin-gold.glb',
@@ -579,62 +588,106 @@
                         'rocks': 'assets/models/environment/rocks.glb',
                         'grass': 'assets/models/environment/grass.glb',
                         'flowers': 'assets/models/environment/flowers.glb',
-                        'hedge': 'assets/models/environment/hedge.glb', // Replaced bush
-                        'mushroom': 'assets/models/environment/mushrooms.glb' // Replaced mushroom
+                        'flowers-tall': 'assets/models/environment/flowers-tall.glb',
+                        'hedge': 'assets/models/environment/hedge.glb',
+                        'mushroom': 'assets/models/environment/mushrooms.glb'
                     },
                     interactive: {
                         'crate': 'assets/models/interactive/crate.glb',
                         'chest': 'assets/models/interactive/chest.glb',
-                        'button': 'assets/models/interactive/button-round.glb',
+                        'button': 'assets/models/interactive/button-square.glb',
                         'door': 'assets/models/interactive/door-rotate.glb',
                         'lever': 'assets/models/interactive/lever.glb',
-                        'flag': 'assets/models/interactive/flag.glb',
-                        'switch': 'assets/models/interactive/button-square.glb' // Replaced switch
+                        'flag': 'assets/models/interactive/flag.glb'
                     },
                     hazards: {
                         'spike': 'assets/models/hazards/spike-block.glb',
                         'saw': 'assets/models/hazards/saw.glb',
-                        'trap': 'assets/models/hazards/trap-spikes.glb',
+                        'trap': 'assets/models/hazards/trap-spikes-large.glb',
                         'bomb': 'assets/models/hazards/bomb.glb'
                     },
                     structures: {
                         'fence': 'assets/models/structures/fence-low-straight.glb',
-                        'ladder': 'assets/models/structures/ladder.glb',
+                        'ladder': 'assets/models/structures/ladder-long.glb',
                         'poles': 'assets/models/structures/poles.glb',
-                        'bridge': 'assets/models/structures/platform-fortified.glb' // Replaced bridge
+                        'bridge': 'assets/models/structures/platform-fortified.glb',
+                        'sign': 'assets/models/structures/sign.glb'
                     }
                 };
                 this.levelData = {
                     spawn: { x: 0, y: 5, z: 0 },
-                    goal: { type: 'collect_keys', count: 2 },
+                    goal: { type: 'collect_keys', count: 3 },
                     platforms: [
-                        { type: 'terrain-dirt', position: { x: 0, y: 0, z: 0 }, scale: { x: 20, y: 1, z: 20 } }, // Uses block-grass-large
-                        { type: 'terrain-rock', position: { x: 15, y: 1, z: 10 }, scale: { x: 5, y: 2, z: 5 } }, // Uses block-snow-large
-                        { type: 'platform-ramp', position: { x: -10, y: 1, z: 15 }, rotation: { y: 90 } },
-                        { type: 'grass-large', position: { x: -15, y: 3, z: -10 }, scale: { x: 8, y: 1, z: 8 } }
+                        // Base terrain (grassy plain)
+                        { type: 'terrain-dirt', position: { x: 0, y: 0, z: 0 }, scale: { x: 50, y: 1, z: 50 } },
+                        // Snowy peaks
+                        { type: 'terrain-rock', position: { x: 30, y: 2, z: -20 }, scale: { x: 10, y: 3, z: 10 } },
+                        { type: 'terrain-rock', position: { x: -25, y: 3, z: 25 }, scale: { x: 8, y: 4, z: 8 } },
+                        // Ramps to access higher areas
+                        { type: 'platform-ramp', position: { x: 10, y: 1, z: -10 }, rotation: { y: 45 }, scale: { x: 2, y: 2, z: 2 } },
+                        { type: 'platform-ramp', position: { x: -15, y: 1, z: 15 }, rotation: { y: -45 }, scale: { x: 2, y: 2, z: 2 } },
+                        // Curved paths for navigation
+                        { type: 'grass-curve', position: { x: 20, y: 1, z: 10 }, rotation: { y: 90 }, scale: { x: 3, y: 1, z: 3 } },
+                        { type: 'grass-curve', position: { x: -20, y: 1, z: -10 }, rotation: { y: -90 }, scale: { x: 3, y: 1, z: 3 } },
+                        // Moving platforms
+                        { type: 'moving-platform', position: { x: 15, y: 2, z: 20 }, scale: { x: 2, y: 1, z: 2 }, userData: { id: 'mp1', startPos: { x: 15, y: 2, z: 20 }, endPos: { x: 15, y: 5, z: 20 }, speed: 0.02 } },
+                        { type: 'moving-platform', position: { x: -10, y: 3, z: -25 }, scale: { x: 2, y: 1, z: 2 }, userData: { id: 'mp2', startPos: { x: -10, y: 3, z: -25 }, endPos: { x: -10, y: 6, z: -25 }, speed: 0.015 } }
                     ],
                     collectibles: [
+                        // Coins scattered across the plain
                         { type: 'coin-gold', position: { x: 5, y: 2, z: 5 } },
                         { type: 'coin-silver', position: { x: -5, y: 2, z: -5 } },
-                        { type: 'key', position: { x: 15, y: 3, z: 10 } },
-                        { type: 'key', position: { x: -15, y: 4, z: -10 } },
-                        { type: 'heart', position: { x: 0, y: 2, z: 15 } }
+                        { type: 'coin-bronze', position: { x: 10, y: 2, z: 0 } },
+                        { type: 'coin-gold', position: { x: 0, y: 2, z: 10 } },
+                        // Keys in challenging locations
+                        { type: 'key', position: { x: 30, y: 6, z: -20 } }, // On snowy peak
+                        { type: 'key', position: { x: -25, y: 7, z: 25 } }, // On another peak
+                        { type: 'key', position: { x: 40, y: 2, z: 30 } }, // In cave
+                        // Hearts and jewels for rewards
+                        { type: 'heart', position: { x: 20, y: 2, z: 15 } },
+                        { type: 'jewel', position: { x: -15, y: 2, z: -15 } }
                     ],
                     hazards: [
-                        { type: 'spike', position: { x: 10, y: 1, z: -5 } },
-                        { type: 'saw', position: { x: -10, y: 2, z: 5 } }
+                        // Spikes on snowy peak
+                        { type: 'spike', position: { x: 32, y: 2, z: -18 } },
+                        { type: 'spike', position: { x: 28, y: 2, z: -22 } },
+                        // Saws near bridge
+                        { type: 'saw', position: { x: 10, y: 2, z: -10 } },
+                        // Traps in cave
+                        { type: 'trap', position: { x: 38, y: 1, z: 28 } },
+                        { type: 'trap', position: { x: 42, y: 1, z: 32 } }
                     ],
                     environment: [
-                        { type: 'tree', position: { x: 8, y: 1, z: 8 }, scale: { x: 2, y: 2, z: 2 } },
-                        { type: 'hedge', position: { x: -8, y: 1, z: 8 } }, // Uses hedge
-                        { type: 'mushroom', position: { x: 0, y: 1, z: -8 } } // Uses mushrooms
+                        // Forest area
+                        { type: 'tree-pine', position: { x: 8, y: 1, z: 8 }, scale: { x: 2, y: 2, z: 2 } },
+                        { type: 'tree', position: { x: -8, y: 1, z: 8 }, scale: { x: 2, y: 2, z: 2 } },
+                        { type: 'hedge', position: { x: 10, y: 1, z: 12 } },
+                        { type: 'hedge', position: { x: -10, y: 1, z: -12 } },
+                        { type: 'mushroom', position: { x: 0, y: 1, z: -8 } },
+                        { type: 'flowers-tall', position: { x: 5, y: 1, z: -5 } },
+                        // Cave decorations
+                        { type: 'rocks', position: { x: 40, y: 1, z: 30 }, scale: { x: 2, y: 2, z: 2 } },
+                        { type: 'mushroom', position: { x: 38, y: 1, z: 28 } }
                     ],
                     interactive: [
-                        { type: 'ladder', position: { x: -15, y: 2, z: -10 }, scale: { x: 1, y: 2, z: 1 } },
-                        { type: 'lever', position: { x: 5, y: 1, z: -5 } },
-                        { type: 'door', position: { x: 15, y: 1, z: 0 }, userData: { locked: true } },
-                        { type: 'chest', position: { x: 0, y: 1, z: -15 } },
-                        { type: 'bridge', position: { x: 10, y: 2, z: -10 }, scale: { x: 5, y: 1, z: 2 } } // Uses platform-fortified
+                        // Ladders to snowy peaks
+                        { type: 'ladder', position: { x: 30, y: 3, z: -20 }, scale: { x: 1, y: 3, z: 1 } },
+                        { type: 'ladder', position: { x: -25, y: 4, z: 25 }, scale: { x: 1, y: 4, z: 1 } },
+                        // Lever to activate moving platform mp1
+                        { type: 'lever', position: { x: 12, y: 1, z: 15 }, userData: { platformId: 'mp1' } },
+                        // Button to unlock door
+                        { type: 'button', position: { x: 35, y: 1, z: 25 }, userData: { platformId: 'mp2' } },
+                        // Door to cave
+                        { type: 'door', position: { x: 40, y: 1, z: 25 }, userData: { locked: true } },
+                        // Chest with reward
+                        { type: 'chest', position: { x: -20, y: 1, z: -15 } },
+                        // Bridge to cave
+                        { type: 'bridge', position: { x: 25, y: 2, z: 0 }, scale: { x: 5, y: 1, z: 2 }, rotation: { y: 90 } },
+                        // Flag as final goal
+                        { type: 'flag', position: { x: 45, y: 2, z: 35 } },
+                        // Signs for guidance
+                        { type: 'sign', position: { x: 0, y: 1, z: 5 }, rotation: { y: 180 } },
+                        { type: 'sign', position: { x: 20, y: 1, z: -5 }, rotation: { y: 45 } }
                     ]
                 };
             }
@@ -661,6 +714,7 @@
                 this.hazards = [];
                 this.environment = [];
                 this.interactive = [];
+                this.movingPlatforms = [];
                 this.totalCoins = 0;
                 this.unlockedDoors = [];
             }
@@ -669,7 +723,9 @@
                 for (const platformData of this.levelData.platforms) {
                     const platform = await this.createObject('platforms', platformData);
                     if (platform) {
+                        platform.userData = platformData.userData || {};
                         this.platforms.push(platform);
+                        if (platform.userData.id) this.movingPlatforms.push(platform);
                         this.scene.add(platform);
                     }
                 }
@@ -712,7 +768,14 @@
                 for (const interactiveData of this.levelData.interactive) {
                     const interactive = await this.createObject('interactive', interactiveData);
                     if (interactive) {
-                        interactive.userData = { type: interactiveData.type, action: interactiveData.action || 'none', locked: interactiveData.userData?.locked || false, activated: false, opened: false };
+                        interactive.userData = { 
+                            type: interactiveData.type, 
+                            action: interactiveData.action || 'none', 
+                            locked: interactiveData.userData?.locked || false, 
+                            activated: false, 
+                            opened: false,
+                            platformId: interactiveData.userData?.platformId
+                        };
                         this.interactive.push(interactive);
                         this.scene.add(interactive);
                     }
@@ -747,20 +810,28 @@
             }
             getFallbackColor(type) {
                 const colorMap = {
-                    'grass': 0x4CAF50, 'platform': 0x9E9E9E, 'terrain-dirt': 0x4CAF50, 'terrain-rock': 0xD3D3D3,
+                    'grass': 0x4CAF50, 'platform': 0x9E9E9E, 'terrain-dirt': 0x4CAF50, 'terrain-rock': 0xD3D3D3, 'moving-platform': 0x2196F3,
                     'coin-gold': 0xFFD700, 'coin-silver': 0xC0C0C0, 'coin-bronze': 0xCD7F32, 'heart': 0xFF69B4, 'jewel': 0x9C27B0, 'key': 0xFFC107,
                     'spike': 0xFF5722, 'saw': 0xF44336, 'trap': 0xFF1744, 'bomb': 0x000000,
-                    'tree': 0x2E7D32, 'rocks': 0x5D4037, 'grass': 0x4CAF50, 'flowers': 0xE91E63, 'hedge': 0x4CAF50, 'mushroom': 0xF4A460
+                    'tree': 0x2E7D32, 'rocks': 0x5D4037, 'grass': 0x4CAF50, 'flowers': 0xE91E63, 'flowers-tall': 0xE91E63, 'hedge': 0x4CAF50, 'mushroom': 0xF4A460,
+                    'sign': 0x8B4513
                 };
                 return colorMap[type] || 0x808080;
             }
             getFallbackGeometry(type) {
-                const geometryMap = { 'heart': 'sphere', 'coin-gold': 'cylinder', 'coin-silver': 'cylinder', 'coin-bronze': 'cylinder', 'tree': 'cylinder', 'saw': 'cylinder' };
+                const geometryMap = { 
+                    'heart': 'sphere', 'coin-gold': 'cylinder', 'coin-silver': 'cylinder', 'coin-bronze': 'cylinder', 
+                    'tree': 'cylinder', 'saw': 'cylinder', 'key': 'cylinder', 'jewel': 'sphere' 
+                };
                 return geometryMap[type] || 'box';
             }
             applyTransformations(object, objectData) {
                 if (objectData.position) object.position.set(objectData.position.x || 0, objectData.position.y || 0, objectData.position.z || 0);
-                if (objectData.rotation) object.rotation.set(Utils.degToRad(objectData.rotation.x || 0), Utils.degToRad(objectData.rotation.y || 0), Utils.degToRad(objectData.rotation.z || 0));
+                if (objectData.rotation) object.rotation.set(
+                    Utils.degToRad(objectData.rotation.x || 0), 
+                    Utils.degToRad(objectData.rotation.y || 0), 
+                    Utils.degToRad(objectData.rotation.z || 0)
+                );
                 if (objectData.scale) object.scale.set(objectData.scale.x || 1, objectData.scale.y || 1, objectData.scale.z || 1);
             }
             countTotalCoins() {
@@ -778,8 +849,17 @@
                     if (hazard.userData.type === 'saw') Utils.animateRotate(hazard, 0, 0, 0.1);
                 });
                 this.environment.forEach(envObj => {
-                    if (envObj.userData && (envObj.userData.type === 'tree' || envObj.userData.type === 'grass' || envObj.userData.type === 'hedge')) {
+                    if (envObj.userData && (envObj.userData.type === 'tree' || envObj.userData.type === 'tree-pine' || envObj.userData.type === 'hedge' || envObj.userData.type === 'flowers-tall')) {
                         envObj.rotation.z = Math.sin(Date.now() * 0.001) * 0.02;
+                    }
+                });
+                this.movingPlatforms.forEach(platform => {
+                    if (platform.userData.activated) {
+                        Utils.animateMovingPlatform(platform, 
+                            new THREE.Vector3(platform.userData.startPos.x, platform.userData.startPos.y, platform.userData.startPos.z),
+                            new THREE.Vector3(platform.userData.endPos.x, platform.userData.endPos.y, platform.userData.endPos.z),
+                            platform.userData.speed
+                        );
                     }
                 });
             }
@@ -795,19 +875,10 @@
             }
             checkLevelComplete() {
                 const goal = this.getLevelGoal();
-                switch (goal.type) {
-                    case 'collect_all_coins':
-                        const collectedCoins = this.collectibles.filter(item => item.userData.type && item.userData.type.includes('coin') && item.userData.collected).length;
-                        return collectedCoins >= this.totalCoins;
-                    case 'reach_flag':
-                        const flag = this.interactive.find(obj => obj.userData.type === 'flag');
-                        if (flag && game.player) return Utils.distance(game.player.position, flag.position) < 3;
-                        return false;
-                    case 'collect_keys':
-                        return game.player.keysCollected >= (goal.count || 1);
-                    default:
-                        return false;
+                if (goal.type === 'collect_keys') {
+                    return game.player.keysCollected >= (goal.count || 3);
                 }
+                return false;
             }
             resetCollectibles() {
                 this.collectibles.forEach(collectible => {
@@ -815,6 +886,29 @@
                     collectible.visible = true;
                     collectible.position.copy(collectible.userData.originalPosition);
                 });
+                this.interactive.forEach(obj => {
+                    if (obj.userData.type === 'lever' || obj.userData.type === 'button') {
+                        obj.userData.activated = false;
+                        obj.rotation.z = 0;
+                    }
+                    if (obj.userData.type === 'chest') {
+                        obj.userData.opened = false;
+                        obj.position.y = obj.userData.originalPosition ? obj.userData.originalPosition.y : obj.position.y - 0.5;
+                    }
+                    if (obj.userData.type === 'door' && this.unlockedDoors.includes(obj)) {
+                        obj.userData.locked = true;
+                        obj.rotation.y = 0;
+                    }
+                });
+                this.movingPlatforms.forEach(platform => {
+                    platform.userData.activated = false;
+                    platform.position.set(
+                        platform.userData.startPos.x,
+                        platform.userData.startPos.y,
+                        platform.userData.startPos.z
+                    );
+                });
+                this.unlockedDoors = [];
             }
             unlockDoor() {
                 const door = this.interactive.find(obj => obj.userData.type === 'door' && obj.userData.locked);
@@ -824,6 +918,13 @@
                     this.unlockedDoors.push(door);
                     game.player.keysCollected--;
                     Utils.updateUI('keys', game.player.keysCollected);
+                    Utils.createParticleEffect(this.scene, door.position.clone(), 0x00FF00);
+                }
+            }
+            activatePlatform(platformId) {
+                const platform = this.movingPlatforms.find(p => p.userData.id === platformId);
+                if (platform) {
+                    platform.userData.activated = true;
                 }
             }
             getPlatforms() { return this.platforms; }
@@ -866,6 +967,7 @@
                     'assets/models/platforms/platform.glb',
                     'assets/models/platforms/platform-ramp.glb',
                     'assets/models/platforms/block-snow-large.glb',
+                    'assets/models/platforms/block-moving.glb',
                     'assets/models/collectibles/coin-gold.glb',
                     'assets/models/collectibles/coin-silver.glb',
                     'assets/models/collectibles/coin-bronze.glb',
@@ -877,28 +979,29 @@
                     'assets/models/environment/rocks.glb',
                     'assets/models/environment/grass.glb',
                     'assets/models/environment/flowers.glb',
+                    'assets/models/environment/flowers-tall.glb',
                     'assets/models/environment/hedge.glb',
                     'assets/models/environment/mushrooms.glb',
                     'assets/models/interactive/crate.glb',
                     'assets/models/interactive/chest.glb',
-                    'assets/models/interactive/button-round.glb',
+                    'assets/models/interactive/button-square.glb',
                     'assets/models/interactive/door-rotate.glb',
                     'assets/models/interactive/lever.glb',
                     'assets/models/interactive/flag.glb',
-                    'assets/models/interactive/button-square.glb',
                     'assets/models/hazards/spike-block.glb',
                     'assets/models/hazards/saw.glb',
-                    'assets/models/hazards/trap-spikes.glb',
+                    'assets/models/hazards/trap-spikes-large.glb',
                     'assets/models/hazards/bomb.glb',
                     'assets/models/structures/fence-low-straight.glb',
-                    'assets/models/structures/ladder.glb',
+                    'assets/models/structures/ladder-long.glb',
                     'assets/models/structures/poles.glb',
-                    'assets/models/structures/platform-fortified.glb'
+                    'assets/models/structures/platform-fortified.glb',
+                    'assets/models/structures/sign.glb'
                 ];
                 this.animationId = null;
             }
             async init() {
-                console.log('Initializing 3D Exploration Game...');
+                console.log('Initializing Canyon of Secrets...');
                 try {
                     this.setupScene();
                     this.setupCamera();
@@ -927,7 +1030,7 @@
             }
             setupCamera() {
                 this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.set(0, 10, 15);
+                this.camera.position.set(0, 15, 20);
             }
             setupRenderer() {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -939,21 +1042,21 @@
                 document.getElementById('gameContainer').appendChild(this.renderer.domElement);
             }
             setupLighting() {
-                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.7);
                 this.scene.add(ambientLight);
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
                 directionalLight.position.set(50, 50, 50);
                 directionalLight.castShadow = true;
                 directionalLight.shadow.mapSize.width = 2048;
                 directionalLight.shadow.mapSize.height = 2048;
                 directionalLight.shadow.camera.near = 0.5;
                 directionalLight.shadow.camera.far = 500;
-                directionalLight.shadow.camera.left = -50;
-                directionalLight.shadow.camera.right = 50;
-                directionalLight.shadow.camera.top = 50;
-                directionalLight.shadow.camera.bottom = -50;
+                directionalLight.shadow.camera.left = -100;
+                directionalLight.shadow.camera.right = 100;
+                directionalLight.shadow.camera.top = 100;
+                directionalLight.shadow.camera.bottom = -100;
                 this.scene.add(directionalLight);
-                const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.3);
+                const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.4);
                 fillLight.position.set(-30, 20, -30);
                 this.scene.add(fillLight);
             }
@@ -1001,7 +1104,6 @@
                 document.addEventListener('keydown', (event) => {
                     switch(event.code) {
                         case 'KeyR': this.restartLevel(); break;
-                        case 'KeyN': this.nextLevel(); break;
                         case 'KeyP': case 'Escape': this.togglePause(); break;
                         case 'KeyM': this.toggleMusic(); break;
                     }
@@ -1022,6 +1124,8 @@
                         const spawnPos = this.level.getPlayerSpawnPosition();
                         this.player.reset(spawnPos);
                         this.gameState.coins = 0;
+                        this.gameState.lives = 3;
+                        this.player.lives = 3;
                         this.updateUI();
                         console.log(`Level ${levelNumber} loaded successfully`);
                         return true;
@@ -1060,29 +1164,15 @@
                 this.renderer.render(this.scene, this.camera);
             }
             levelComplete() {
-                const nextLevel = this.gameState.currentLevel + 1;
-                if (nextLevel <= 3) {
-                    Utils.showMessage(
-                        'Level Complete!',
-                        `Great job! Ready for level ${nextLevel}?`,
-                        'Next Level',
-                        () => {
-                            Utils.hideMessage();
-                            this.loadLevel(nextLevel);
-                        }
-                    );
-                } else {
-                    Utils.showMessage(
-                        'Game Complete!',
-                        `Congratulations! You've completed all levels!\nFinal Score: ${this.gameState.score}`,
-                        'Play Again',
-                        () => {
-                            Utils.hideMessage();
-                            this.loadLevel(1);
-                            this.gameState.score = 0;
-                        }
-                    );
-                }
+                Utils.showMessage(
+                    'Level Complete!',
+                    `Congratulations! You conquered the Canyon of Secrets!\nFinal Score: ${this.gameState.score}`,
+                    'Play Again',
+                    () => {
+                        Utils.hideMessage();
+                        this.restartGame();
+                    }
+                );
             }
             playerDied() {
                 if (this.gameState.lives <= 0) {
@@ -1117,18 +1207,8 @@
                 this.player.isAlive = true;
                 this.loadLevel(1);
             }
-            nextLevel() {
-                const nextLevel = this.gameState.currentLevel + 1;
-                if (nextLevel <= 3) this.loadLevel(nextLevel);
-            }
-            togglePause() {
-                this.gameState.isPaused = !this.gameState.isPaused;
-                Utils.togglePauseMenu(this.gameState.isPaused);
-                console.log(this.gameState.isPaused ? 'Game paused' : 'Game resumed');
-            }
-            resumeGame() {
-                this.gameState.isPaused = false;
-                Utils.togglePauseMenu(false);
+            activatePlatform(platformId) {
+                this.level.activatePlatform(platformId);
             }
             addScore(points) {
                 this.gameState.score += points;
@@ -1143,7 +1223,8 @@
                 Utils.updateUI('score', this.gameState.score);
                 Utils.updateUI('lives', this.player ? this.player.lives : this.gameState.lives);
                 Utils.updateUI('coins', this.gameState.coins);
-                Utils.updateUI('currentLevel', this.gameState.currentLevel);
+                Utils.updateUI('currentLevel', 'Canyon of Secrets');
+                Utils.updateUI('keys', this.player ? this.player.keysCollected : 0);
             }
             onWindowResize() {
                 this.camera.aspect = window.innerWidth / window.innerHeight;
