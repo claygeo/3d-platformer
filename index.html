@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenney 3D Platformer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Loading Screen -->
+        <div id="loading">
+            <div class="loading-content">
+                <h1>3D Platformer</h1>
+                <div class="loading-text">Loading Kenney Assets...</div>
+                <div class="loading-bar">
+                    <div class="loading-fill" id="loadingFill"></div>
+                </div>
+                <div id="loadingPercent">0%</div>
+            </div>
+        </div>
+
+        <!-- Main Game UI -->
+        <div id="gameUI" style="display: none;">
+            <div id="topUI">
+                <div class="ui-panel">
+                    <div class="stat">
+                        <span class="label">Score:</span>
+                        <span id="score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Lives:</span>
+                        <span id="lives">3</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Coins:</span>
+                        <span id="coins">0</span>/<span id="totalCoins">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Level:</span>
+                        <span id="currentLevel">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="instructions">
+                <div class="control-group">
+                    <h3>Controls</h3>
+                    <div class="control"><span class="key">WASD</span> Move</div>
+                    <div class="control"><span class="key">Space</span> Jump</div>
+                    <div class="control"><span class="key">Mouse</span> Look Around</div>
+                    <div class="control"><span class="key">R</span> Restart Level</div>
+                    <div class="control"><span class="key">N</span> Next Level</div>
+                </div>
+            </div>
+
+            <!-- Game Messages -->
+            <div id="gameMessage" class="hidden">
+                <div class="message-content">
+                    <h2 id="messageTitle">Level Complete!</h2>
+                    <p id="messageText">Great job! Moving to next level...</p>
+                    <button id="messageButton" onclick="game.hideMessage()">Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pauseMenu" class="hidden">
+            <div class="menu-content">
+                <h2>Game Paused</h2>
+                <button onclick="game.resumeGame()">Resume</button>
+                <button onclick="game.restartLevel()">Restart Level</button>
+                <button onclick="game.loadLevel(1)">Back to Level 1</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Game Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/level.js"></script>
+    <script src="js/game.js"></script>
+
+    <script>
+        // Initialize game when page loads
+        window.addEventListener('load', () => {
+            game.init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+{
+  "name": "Dangerous Cliffs",
+  "description": "Watch out for spikes and gaps!",
+  "spawn": {
+    "x": 0,
+    "y": 5,
+    "z": 0
+  },
+  "goal": {
+    "type": "collect_all_coins"
+  },
+  "platforms": [
+    {
+      "type": "grass",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 6, "y": 2, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 }
+    },
+    {
+      "type": "platform",
+      "position": { "x": 12, "y": 4, "z": 0 },
+      "scale": { "x": 1.2, "y": 1, "z": 1.2 }
+    },
+    {
+      "type": "grass-corner",
+      "position": { "x": 18, "y": 3, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 24, "y": 5, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "platform-ramp",
+      "position": { "x": 30, "y": 6, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 },
+      "rotation": { "x": 0, "y": 45, "z": 0 }
+    },
+    {
+      "type": "grass-large",
+      "position": { "x": 36, "y": 8, "z": 0 },
+      "scale": { "x": 1.8, "y": 1, "z": 1.8 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 42, "y": 10, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass-curve",
+      "position": { "x": 48, "y": 8, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 54, "y": 6, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": -6, "y": 1, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 }
+    },
+    {
+      "type": "platform",
+      "position": { "x": -12, "y": 3, "z": 0 },
+      "scale": { "x": 1.2, "y": 1, "z": 1.2 }
+    }
+  ],
+  "collectibles": [
+    {
+      "type": "coin-gold",
+      "position": { "x": 3, "y": 3, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-silver",
+      "position": { "x": 9, "y": 5, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 15, "y": 7, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "jewel",
+      "position": { "x": 21, "y": 6, "z": 0 },
+      "scale": { "x": 0.6, "y": 0.6, "z": 0.6 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 27, "y": 8, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-bronze",
+      "position": { "x": 33, "y": 9, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 39, "y": 11, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "key",
+      "position": { "x": 45, "y": 13, "z": 0 },
+      "scale": { "x": 0.7, "y": 0.7, "z": 0.7 }
+    },
+    {
+      "type": "coin-silver",
+      "position": { "x": 51, "y": 9, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "heart",
+      "position": { "x": 57, "y": 9, "z": 0 },
+      "scale": { "x": 0.6, "y": 0.6, "z": 0.6 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": -3, "y": 4, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-bronze",
+      "position": { "x": -9, "y": 6, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    }
+  ],
+  "hazards": [
+    {
+      "type": "spike",
+      "position": { "x": 9, "y": 2, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "damage": 1
+    },
+    {
+      "type": "spike",
+      "position": { "x": 21, "y": 3, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "damage": 1
+    },
+    {
+      "type": "saw",
+      "position": { "x": 33, "y": 6, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 },
+      "damage": 1
+    },
+    {
+      "type": "trap",
+      "position": { "x": 45, "y": 8, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "damage": 1
+    }
+  ],
+  "environment": [
+    {
+      "type": "tree-pine",
+      "position": { "x": -15, "y": 3, "z": -5 },
+      "scale": { "x": 1, "y": 1, "z": 1 }
+    },
+    {
+      "type": "tree",
+      "position": { "x": 60, "y": 6, "z": -8 },
+      "scale": { "x": 1.3, "y": 1.3, "z": 1.3 }
+    },
+    {
+      "type": "rocks",
+      "position": { "x": 15, "y": 3, "z": -4 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "rocks",
+      "position": { "x": 40, "y": 10, "z": -3 },
+      "scale": { "x": 0.6, "y": 0.6, "z": 0.6 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 25, "y": 5, "z": 3 },
+      "scale": { "x": 1, "y": 1, "z": 1 }
+    },
+    {
+      "type": "flowers",
+      "position": { "x": 50, "y": 8, "z": 4 },
+      "scale": { "x": 0.9, "y": 0.9, "z": 0.9 }
+    }
+  ],
+  "interactive": [
+    {
+      "type": "flag",
+      "position": { "x": 57, "y": 9, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "action": "level_complete"
+    },
+    {
+      "type": "chest",
+      "position": { "x": 42, "y": 12, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "crate",
+      "position": { "x": 18, "y": 5, "z": 2 },
+      "scale": { "x": 0.7, "y": 0.7, "z": 0.7 }
+    },
+    {
+      "type": "button",
+      "position": { "x": 30, "y": 8, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    }
+  ],
+  "structures": [
+    {
+      "type": "fence",
+      "position": { "x": -8, "y": 3, "z": 5 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 45, "z": 0 }
+    },
+    {
+      "type": "ladder",
+      "position": { "x": 36, "y": 5, "z": -2 },
+      "scale": { "x": 1, "y": 1.5, "z": 1 }
+    },
+    {
+      "type": "poles",
+      "position": { "x": 52, "y": 6, "z": -6 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    }
+  ]
+}

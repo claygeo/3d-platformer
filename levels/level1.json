@@ -1,0 +1,175 @@
+{
+  "name": "Green Hills",
+  "description": "A peaceful introduction to the world",
+  "spawn": {
+    "x": 0,
+    "y": 5,
+    "z": 0
+  },
+  "goal": {
+    "type": "collect_all_coins"
+  },
+  "platforms": [
+    {
+      "type": "grass",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 4, "y": 0, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 8, "y": 1, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass-large",
+      "position": { "x": 12, "y": 2, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 16, "y": 3, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 20, "y": 4, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass-corner",
+      "position": { "x": 24, "y": 5, "z": 0 },
+      "scale": { "x": 1.5, "y": 1, "z": 1.5 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": 28, "y": 6, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": -4, "y": 0, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": -8, "y": 1, "z": 0 },
+      "scale": { "x": 2, "y": 1, "z": 2 }
+    }
+  ],
+  "collectibles": [
+    {
+      "type": "coin-gold",
+      "position": { "x": 2, "y": 3, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 6, "y": 3, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 10, "y": 4, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-silver",
+      "position": { "x": 14, "y": 5, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 18, "y": 6, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 22, "y": 7, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": 26, "y": 8, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "heart",
+      "position": { "x": 30, "y": 9, "z": 0 },
+      "scale": { "x": 0.6, "y": 0.6, "z": 0.6 }
+    },
+    {
+      "type": "coin-bronze",
+      "position": { "x": -2, "y": 3, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "coin-gold",
+      "position": { "x": -6, "y": 4, "z": 0 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    }
+  ],
+  "environment": [
+    {
+      "type": "tree",
+      "position": { "x": -12, "y": 1, "z": -5 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "tree",
+      "position": { "x": 32, "y": 6, "z": -8 },
+      "scale": { "x": 1.2, "y": 1.2, "z": 1.2 }
+    },
+    {
+      "type": "tree-pine",
+      "position": { "x": 15, "y": 2, "z": -6 },
+      "scale": { "x": 1, "y": 1, "z": 1 }
+    },
+    {
+      "type": "rocks",
+      "position": { "x": 5, "y": 1, "z": -3 },
+      "scale": { "x": 0.6, "y": 0.6, "z": 0.6 }
+    },
+    {
+      "type": "grass",
+      "position": { "x": -5, "y": 1, "z": 2 },
+      "scale": { "x": 1, "y": 1, "z": 1 }
+    },
+    {
+      "type": "flowers",
+      "position": { "x": 25, "y": 5, "z": 3 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    },
+    {
+      "type": "rocks",
+      "position": { "x": 35, "y": 6, "z": 2 },
+      "scale": { "x": 0.7, "y": 0.7, "z": 0.7 }
+    }
+  ],
+  "interactive": [
+    {
+      "type": "flag",
+      "position": { "x": 30, "y": 9, "z": 0 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "action": "level_complete"
+    },
+    {
+      "type": "crate",
+      "position": { "x": 10, "y": 3, "z": 2 },
+      "scale": { "x": 0.8, "y": 0.8, "z": 0.8 }
+    }
+  ],
+  "hazards": [],
+  "structures": [
+    {
+      "type": "fence",
+      "position": { "x": -10, "y": 1, "z": 4 },
+      "scale": { "x": 1, "y": 1, "z": 1 },
+      "rotation": { "x": 0, "y": 90, "z": 0 }
+    }
+  ]
+}
